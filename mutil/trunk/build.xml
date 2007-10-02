@@ -1,0 +1,94 @@
+<?xml version="1.0"?>
+<!--
+  Copyright (c) 2006 Matt Magoffin
+  
+  This program is free software; you can redistribute it and/or 
+  modify it under the terms of the GNU General Public License as 
+  published by the Free Software Foundation; either version 2 of 
+  the License, or (at your option) any later version.
+  
+  This program is distributed in the hope that it will be useful, 
+  but WITHOUT ANY WARRANTY; without even the implied warranty of 
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU 
+  General Public License for more details.
+  
+  You should have received a copy of the GNU General Public License 
+  along with this program; if not, write to the Free Software 
+  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 
+  02111-1307 USA
+
+  $Id: build.xml,v 1.5 2007/10/02 09:03:52 matt Exp $   
+-->
+<project name="Mutil" default="dist">
+
+	<property file="build.properties" />
+
+	<property name="dir.base" value="."/>
+	<property name="dir.source" value="src"/>
+	<property name="dir.build" value="build/ant" />
+	<property name="dir.compile" value="${dir.build}/classes"/>
+	<property name="dir.dist" value="dist"/>
+	<property name="dir.lib" value="lib"/>
+	
+	<property name="app.name" value="mutil" />
+	
+	<property name="dir.app.dest" value="${dir.build}/${app.name}"/>
+	<property name="compile.debug" value="true" />
+	<property name="compile.deprecation" value="false" />
+	<property name="compile.optimize" value="true" />
+	<property name="compile.nowarn" value="true" />
+	
+	<property name="build.version" value="(local build)"/>
+	
+	<tstamp>
+		<format property="build.time" pattern="MM/dd/yyyy hh:mm aa z" />
+	</tstamp>
+	
+	<path id="compile.path">
+		<pathelement location="${dir.compile}"/>
+		<fileset dir="${dir.lib}" includes="**/*.jar"/>
+	</path>
+	
+	<target name="init">
+		<mkdir dir="${dir.build}" />
+	</target>
+	
+	<target name="compile" description="Compile source files">
+		<mkdir dir="${dir.compile}"/>
+		<javac srcdir="${dir.source}"
+			destdir="${dir.compile}"
+			debug="${compile.debug}" 
+			deprecation="${compile.deprecation}" 
+			optimize="${compile.optimize}" 
+			nowarn="${compile.nowarn}"
+			target="1.5"
+			source="1.5">
+			<classpath refid="compile.path" />
+		</javac>
+	</target>
+	
+	<target name="clean" description="Delete build files">
+		<delete dir="${dir.build}" />
+	</target>
+	
+	<target name="dist-mutil-jar" description="Generate a distribution JAR"
+		depends="compile">
+		<mkdir dir="${dir.dist}"/>
+		<jar destfile="${dir.dist}/${app.name}.jar">
+			<fileset dir="${dir.compile}">
+				<include name="magoffin/matt/**"/>
+			</fileset>
+			<fileset dir="${dir.source}">
+				<include name="magoffin/matt/**"/>
+			</fileset>
+		</jar>
+	</target>
+	
+	<target name="dist" description="Prepare the distribution JARs"
+		depends="dist-mutil-jar"/>
+
+	<target name="help">
+		<echo>TODO</echo>
+	</target>
+	
+</project>

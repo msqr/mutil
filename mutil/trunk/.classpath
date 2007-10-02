@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="lib" path="lib/spring-1.2.8.jar" sourcepath="lib/spring-1.2.8-src.jar"/>
+	<classpathentry kind="lib" path="lib/log4j-1.2.13.jar"/>
+	<classpathentry kind="lib" path="lib/glf.jar"/>
+	<classpathentry kind="lib" path="lib/commons-logging-1.0.4.jar"/>
+	<classpathentry kind="lib" path="lib/cglib-2.1.jar"/>
+	<classpathentry kind="lib" path="lib/asm-attrs.jar"/>
+	<classpathentry kind="lib" path="lib/asm.jar"/>
+	<classpathentry kind="lib" path="lib/antlr-2.7.6.jar"/>
+	<classpathentry kind="lib" path="lib/hibernate-2.1.8.jar"/>
+	<classpathentry kind="lib" path="lib/ehcache-1.2.4.jar"/>
+	<classpathentry kind="lib" path="lib/hibernate-3.2.1.jar"/>
+	<classpathentry kind="lib" path="lib/lucene/lucene-core-2.2.0.jar" sourcepath="lib/lucene/lucene-2.2.0-src.jar"/>
+	<classpathentry kind="lib" path="lib/lucene/lucene-snowball-2.2.0.jar"/>
+	<classpathentry kind="lib" path="lib/commons-collections-2.1.1.jar"/>
+	<classpathentry kind="lib" path="lib/commons-lang-2.2.jar"/>
+	<classpathentry kind="lib" path="lib/commons-beanutils-core-1.7.0.jar"/>
+	<classpathentry kind="output" path="build/eclipse"/>
+</classpath>
