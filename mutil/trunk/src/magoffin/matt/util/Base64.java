@@ -91,6 +91,44 @@ public final class Base64 {
 	}
 
 	/**
+	 * Decode a character array of Base64-encoded data, which assumes the 
+	 * specified input data length is already a multiple of 4.
+	 * 
+	 * <p>Final Base64 padding characters (=) are allowed.</p>
+	 * 
+	 * @param data the Base64 character data
+	 * @param start the starting character input index
+	 * @param end the ending chracter input index
+	 * @return the decoded data
+	 */
+	public static byte[] decodeFast(char data[], int start, int end) {
+		int len = (end - start) / 4 * 3;
+		byte out[] = new byte[len];
+		int shift = 0;
+		int accum = 0;
+		int index = 0;
+		for (int ix = start; ix < end; ix++) {
+			int value = (data[ix] > 255) ? -1 : codes[data[ix]];
+			if (value >= 0) {
+				accum <<= 6;
+				shift += 6;
+				accum |= value;
+				if (shift >= 8) {
+					shift -= 8;
+					out[index++] = (byte) (accum >> shift & 255);
+				}
+			}
+		}
+		if (index != out.length) {
+			// assume we are dealing with some final padding characters
+			byte[] copy = new byte[index];
+			System.arraycopy(out, 0, copy, 0, index);
+			return copy;
+		}
+		return out;
+	}
+
+	/**
 	 * Encode arbitrary data as Base64 ASCI character data.
 	 * @param data the bytes to encode
 	 * @return the Base64 encoded value
