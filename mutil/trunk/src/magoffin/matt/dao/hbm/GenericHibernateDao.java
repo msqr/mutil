@@ -214,7 +214,6 @@ extends HibernateDaoSupport implements GenericDao<T,PK> {
 	 * @param parameters the parameters to pass to the query
 	 * @return the list of results, or an empty list if none found
 	 */
-	@SuppressWarnings("unchecked")
 	protected List<T> findByNamedQuery(final String queryName, 
 			final Map<String, Object> parameters) {
 		return findByNamedQuery(queryName, parameters, 0, 0);

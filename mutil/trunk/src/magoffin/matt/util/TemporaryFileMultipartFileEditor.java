@@ -62,7 +62,7 @@ public class TemporaryFileMultipartFileEditor extends PropertyEditorSupport {
 	public void setValue(Object value) {
 		if (value instanceof MultipartFile) {
 			final MultipartFile multipartFile = (MultipartFile)value;
-			if ( !allowEmpty && (multipartFile == null || multipartFile.isEmpty()) ) {
+			if ( !allowEmpty && multipartFile.isEmpty() ) {
 				throw new IllegalArgumentException("MultipartFile may not be null");
 			}
 			super.setValue(new TemporaryFile() {

@@ -776,7 +776,7 @@ public class LuceneSearchService implements LuceneService {
 			} else {
 				appendTerms(tmp, field, listValue, joinOp, false);
 			}
-		} else if ( value != null ) {
+		} else {
 			String valueStr = value.toString();
 			if ( matchPattern != null ) {
 				if ( !matchPattern.matcher(valueStr).find() ) {

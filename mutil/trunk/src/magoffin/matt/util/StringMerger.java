@@ -190,8 +190,6 @@ public final class StringMerger {
 										LOG.warn("Exception getting property '" +varName2 
 												+"' out of " +o.getClass() +": " +e2);
 									}
-								} else {
-									o = null;
 								}
 							} else {
 								// simply check for key

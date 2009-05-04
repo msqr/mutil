@@ -116,7 +116,6 @@ public final class MessageDigester {
 		String label = null;
 		byte[] pwhash = null;
 
-		label = null;
 		if (ALG.startsWith("SHA")) {
 			label = (salt.length > 0) ? "{SSHA}" : "{SHA}";
 		}
