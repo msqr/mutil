@@ -75,6 +75,9 @@
 		depends="compile">
 		<mkdir dir="${dir.dist}"/>
 		<jar destfile="${dir.dist}/${app.name}.jar">
+			<fileset dir="${dir.source}">
+				<include name="META-INF/**"/>
+			</fileset>
 			<fileset dir="${dir.compile}">
 				<include name="magoffin/matt/**"/>
 			</fileset>

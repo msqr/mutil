@@ -1,0 +1,51 @@
+<taglib xmlns="http://java.sun.com/xml/ns/j2ee"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-jsptaglibrary_2_0.xsd"
+	version="2.0">
+
+	<description>mutil Taglib</description>
+	<tlib-version>1.1</tlib-version>
+	<short-name>mutil</short-name>
+	<uri>http://msqr.us/mutil/tags</uri>
+
+	<tag>
+		<description> Search through packages to list out all class names found,
+			optionally limiting the returned list to classes implementing some
+			interface. </description>
+		<name>classNames</name>
+		<tag-class>magoffin.matt.web.util.ClassnameListTag</tag-class>
+		<body-content>JSP</body-content>
+		<attribute>
+			<description> Comma-delimited list of package names to search in. </description>
+			<name>packages</name>
+			<required>true</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<attribute>
+			<description> Comma-delimited list of interface names to limit
+				returned class name list to. </description>
+			<name>interfaces</name>
+			<required>false</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<attribute>
+			<description> Name of the exported scoped variable for the current
+				item of the iteration. This scoped variable has nested
+				visibility. Its type depends on the object of the underlying
+				collection. </description>
+			<name>var</name>
+			<required>false</required>
+			<rtexprvalue>false</rtexprvalue>
+		</attribute>
+		<attribute>
+			<description> Name of the exported scoped variable for the status of
+				the iteration. Object exported is of type
+				javax.servlet.jsp.jstl.core.LoopTagStatus. This scoped variable
+				has nested visibility. </description>
+			<name>varStatus</name>
+			<required>false</required>
+			<rtexprvalue>false</rtexprvalue>
+		</attribute>
+	</tag>
+
+</taglib>
