@@ -44,8 +44,6 @@ import magoffin.matt.util.ClassUtils;
  * {@code interfaces} property. Both {@code packages} and {@code interfaces} can accept
  * a single value or a comma-delimited list of values.</p>
  * 
- * <p>TODO</p>
- *
  * @author matt
  * @version $Revision$ $Date$
  */
