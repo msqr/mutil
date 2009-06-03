@@ -90,9 +90,9 @@ public class DigitTokenizer extends Tokenizer {
 			numbers = numbers.substring(numbers.length() - maxLength);
 		}
 		complete = true;
-		return new Token(numbers, 0, end);
+		char[] numChars = numbers.toCharArray();
+		return new Token(numChars, 0, numChars.length, 0, end);
 	}
-
 	
 	/**
 	 * @return Returns the maxLength.
@@ -100,7 +100,6 @@ public class DigitTokenizer extends Tokenizer {
 	public int getMaxLength() {
 		return maxLength;
 	}
-
 	
 	/**
 	 * @param maxLength The maxLength to set.

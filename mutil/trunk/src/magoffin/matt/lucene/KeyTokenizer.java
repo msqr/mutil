@@ -130,7 +130,8 @@ public final class KeyTokenizer extends Tokenizer {
 			}
 		}
 		complete = true;
-		return new Token(key, 0, numRead - 1);
+		char[] keyChar = key.toCharArray();
+		return new Token(keyChar, 0, keyChar.length, 0, numRead - 1);
 	}
 	
 	/* Injector methods below. */
