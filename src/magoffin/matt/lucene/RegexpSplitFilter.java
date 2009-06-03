@@ -71,17 +71,19 @@ public class RegexpSplitFilter extends TokenFilter {
 		if ( splitQueue.size() > 0 ) {
 			String next = splitQueue.remove();
 			this.start++;
-			Token t = new Token(next, this.start, this.start + next.length());
+			char[] nextChar = next.toCharArray();
+			Token t = new Token(nextChar, 0, nextChar.length, this.start, this.start + next.length());
 			this.start += next.length();
 			return t;
 		}
 
-	    Token t = input.next();
+		Token reusableToken = new Token();
+	    Token t = input.next(reusableToken);
 	    if (t == null) {
 	    	return null;
 	    }
 	    
-	    String text = t.termText();
+	    String text = t.term();
 	    Matcher matcher = pattern.matcher(text);
 	    if ( !matcher.find() ) {
 	    	return t;
@@ -93,7 +95,8 @@ public class RegexpSplitFilter extends TokenFilter {
 	    	splitQueue.offer(split[i]);
 	    }
 	    this.start = t.startOffset() + split[0].length();
-	    return new Token(split[0], t.startOffset(), this.start);
+	    char[] splitChar = split[0].toCharArray();
+	    return new Token(splitChar, 0, splitChar.length, t.startOffset(), this.start);
 	}
 
 }

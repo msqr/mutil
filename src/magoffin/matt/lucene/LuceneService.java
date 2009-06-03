@@ -36,9 +36,9 @@ import java.util.regex.Pattern;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.search.BooleanQuery;
-import org.apache.lucene.search.Hits;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
+import org.apache.lucene.search.TopDocCollector;
 
 /**
  * API for Lucene plug-in implementation to use for 
@@ -120,7 +120,7 @@ public interface LuceneService {
 		 * @throws IOException if an error occurs
 		 */
 		void doSearcherOp(String type, IndexSearcher searcher, 
-				Query query, Hits hits) throws IOException;
+				Query query, TopDocCollector hits) throws IOException;
 	}
 	
 	/**
@@ -413,7 +413,7 @@ public interface LuceneService {
 	 * @param end the ending hits index to build to
 	 * @return the List of SearchMatch objects
 	 */
-	List<SearchMatch> build(String index, Hits hits, int start, int end);
+	List<SearchMatch> build(String index, TopDocCollector hits, int start, int end);
 	
 	/**
 	 * Add an EventListener for index operations.

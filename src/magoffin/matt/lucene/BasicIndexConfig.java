@@ -25,6 +25,7 @@
 package magoffin.matt.lucene;
 
 import org.apache.lucene.index.IndexWriter;
+import org.apache.lucene.index.LogMergePolicy;
 
 import magoffin.matt.lucene.LucenePlugin.LuceneIndexConfig;
 
@@ -38,7 +39,7 @@ public class BasicIndexConfig implements LuceneIndexConfig {
 	
 	private int minMergeDocs = IndexWriter.DEFAULT_MAX_BUFFERED_DOCS;
 	
-	private int mergeFactor = IndexWriter.DEFAULT_MERGE_FACTOR;
+	private int mergeFactor = LogMergePolicy.DEFAULT_MERGE_FACTOR;
 
 	/**
 	 * Default constructor.

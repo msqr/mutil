@@ -83,7 +83,8 @@ public class RegexpReplaceTokenizer extends Tokenizer {
 		String result = out.toString().replaceAll(this.regexp, this.replace);
 		
 		complete = true;
-		return new Token(result, 0, end);
+		char[] resultChar = result.toCharArray();
+		return new Token(resultChar, 0, resultChar.length, 0, end);
 	}
 	
 	/**

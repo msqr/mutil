@@ -29,6 +29,7 @@ import java.io.IOException;
 import org.apache.lucene.analysis.Token;
 import org.apache.lucene.analysis.TokenFilter;
 import org.apache.lucene.analysis.TokenStream;
+import org.apache.lucene.index.Payload;
 
 /**
  * Filter a stream into a single token for use as a single key.
@@ -79,18 +80,21 @@ public class KeyFilter extends TokenFilter {
 	 */
 	@Override
 	public Token next() throws IOException {
-		Token token = input.next();
-		
+	    final Token t = new Token();
+	    Token token = next(t);
 		if ( token == null ) {
 			return null;
 		}
-		
-		String key = token.termText();
+		Payload p = token.getPayload();
+		if ( p != null ) {
+			token.setPayload((Payload)p.clone());
+		}
+		String key = token.term();
 		if ( key.length() > maxLength ) {
 			key = key.substring(0, maxLength);
 		}
-		
-		return new Token(key, token.startOffset(), token.startOffset()+key.length());
+		char[] keyChars = key.toCharArray();
+		return new Token(keyChars, 0, keyChars.length, token.startOffset(), token.startOffset()+keyChars.length);
 	}
 
 	/* Injector methods below. */

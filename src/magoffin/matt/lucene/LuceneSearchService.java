@@ -73,16 +73,19 @@ import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.IndexWriter;
+import org.apache.lucene.index.Payload;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.index.TermEnum;
+import org.apache.lucene.index.IndexWriter.MaxFieldLength;
 import org.apache.lucene.queryParser.ParseException;
 import org.apache.lucene.queryParser.QueryParser;
 import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.FuzzyQuery;
-import org.apache.lucene.search.Hits;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
+import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.search.TermQuery;
+import org.apache.lucene.search.TopDocCollector;
 import org.apache.lucene.search.BooleanClause.Occur;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
@@ -169,6 +172,9 @@ public class LuceneSearchService implements LuceneService {
 	
 	/** The default value for the <code>discardedIndexReaderProcessorMs</code> property. */
 	public static final long DEFAULT_DISCARDED_INDEX_READER_PROCESSOR_MS = 180000;
+	
+	/** Default max number of search results returned. */
+	public static final int DEFAULT_MAX_SEARCH_RESULTS = 100000;
 	
 	private static final Long ZERO = new Long(0);
 	
@@ -578,8 +584,8 @@ public class LuceneSearchService implements LuceneService {
 				final BasicSearchResults results = new BasicSearchResults();
 				doIndexQueryOp(index, (Query)o, false, new IndexQueryOp() {
 					public void doSearcherOp(String type, IndexSearcher searcher, 
-							Query query, Hits hits) throws IOException {
-						results.setTotalMatches(hits.length());
+							Query query, TopDocCollector hits) throws IOException {
+						results.setTotalMatches(hits.getTotalHits());
 					}
 				});
 				return results;
@@ -590,21 +596,25 @@ public class LuceneSearchService implements LuceneService {
 	}
 
 	/* (non-Javadoc)
-	 * @see magoffin.matt.lucene.LuceneService#build(java.lang.String, org.apache.lucene.search.Hits, int, int)
+	 * @see magoffin.matt.lucene.LuceneService#build(java.lang.String, org.apache.lucene.search.TopDocCollector, int, int)
 	 */
-	public List<SearchMatch> build(String index, Hits hits, int start, int end) {
-		LucenePlugin plugin = this.indexDataMap.get(index).plugin;
-		int length = end > start ? end - start : 0;
-		int hitLength = hits.length();
-		List<SearchMatch> searchMatches = new ArrayList<SearchMatch>(length);
-		try {
-			for ( int i = start; i < end && i < hitLength; i++ ) {
-				searchMatches.add(plugin.build(hits.doc(i)));
+	public List<SearchMatch> build(String index, final TopDocCollector hits, final int start, final int end) {
+		final LucenePlugin plugin = this.indexDataMap.get(index).plugin;
+		final int length = end > start ? end - start : 0;
+		final ScoreDoc[] docs = hits.topDocs().scoreDocs;
+		final int hitLength = docs.length;
+		final List<SearchMatch> searchMatches = new ArrayList<SearchMatch>(length);
+		doIndexSearcherOp(index, new IndexSearcherOp() {
+			public void doSearcherOp(String type, IndexSearcher searcher)
+					throws IOException {
+				for ( int i = start; i < end && i < hitLength; i++ ) {
+					int docId = docs[i].doc;
+					Document doc = searcher.doc(docId);
+					searchMatches.add(plugin.build(doc));
+				}
 			}
-			return searchMatches;
-		} catch ( IOException e ) {
-			throw new RuntimeException(e);
-		}
+		});
+		return searchMatches;
 	}
 
 	/* (non-Javadoc)
@@ -615,11 +625,13 @@ public class LuceneSearchService implements LuceneService {
 		doIndexQueryOp(index, luceneQuery, ASYNCHRONOUS, new IndexQueryOp() {
 			@SuppressWarnings("unchecked")
 			public void doSearcherOp(String indexType, IndexSearcher searcher, 
-					Query myQuery, Hits hits) throws IOException {
-				int numHits = hits == null ? 0 : hits.length();
+					Query myQuery, TopDocCollector hits) throws IOException {
+				int numHits = hits == null ? 0 : hits.getTotalHits();
 				handler.setTotalMatches(numHits);
+				ScoreDoc[] docs = hits == null ? null : hits.topDocs().scoreDocs;
 				for ( int i = 0; i < numHits; i++ ) {
-					Document doc = hits.doc(i);
+					int docId = docs[i].doc;
+					Document doc = searcher.doc(docId);
 					List<Field> fields = doc.getFields();
 					
 					Map<String, String[]> match = new LinkedHashMap<String, String[]>();
@@ -642,8 +654,8 @@ public class LuceneSearchService implements LuceneService {
 		doIndexQueryOp(type, luceneQuery, ASYNCHRONOUS, new IndexQueryOp() {
 			@SuppressWarnings({ "unchecked" })
 			public void doSearcherOp(String indexType, IndexSearcher searcher, 
-					Query myQuery, Hits hits) throws IOException {
-				int numHits = hits == null ? 0 : hits.length();
+					Query myQuery, TopDocCollector hits) throws IOException {
+				int numHits = hits == null ? 0 : hits.getTotalHits();
 				results.totalMatches = numHits;
 				if ( numHits > 0 ) {
 					Set<String> seenFieldNames = new HashSet<String>();
@@ -655,8 +667,10 @@ public class LuceneSearchService implements LuceneService {
 						max = pageSize;
 					}
 					int maxr = maxResults < 1 ? numHits : maxResults;
+					ScoreDoc[] docs = hits == null ? null : hits.topDocs().scoreDocs;
 					for ( int i = start; i < numHits && i < maxr && ((max--) != 0); i++ ) {
-						Document doc = hits.doc(i);
+						int docId = docs[i].doc;
+						Document doc = searcher.doc(docId);
 						List<Field> fields = doc.getFields();
 						
 						// use a TreeMap to keep keys sorted
@@ -714,12 +728,17 @@ public class LuceneSearchService implements LuceneService {
 		TokenStream stream = data.plugin.getAnalyzer().tokenStream(
 				field, reader);
 		try {
+		    Token t = new Token();
 			while ( true ) {
-				Token token = stream.next();
+			    Token token = stream.next(t);
 				if (token == null) {
 					break;
 				}
-				Query q = new TermQuery(new Term(field, token.termText()));
+				Payload p = token.getPayload();
+				if ( p != null ) {
+					token.setPayload((Payload) p.clone());
+				}
+				Query q = new TermQuery(new Term(field, token.term()));
 				rootQuery.add(q, Occur.SHOULD);
 			}
 		} catch ( IOException e ) {
@@ -742,12 +761,17 @@ public class LuceneSearchService implements LuceneService {
 		TokenStream stream = data.plugin.getAnalyzer().tokenStream(
 				field, reader);
 		try {
+		    Token t = new Token();
 			while ( true ) {
-				Token token = stream.next();
+			    Token token = stream.next(t);
 				if (token == null) {
 					break;
 				}
-				Query q = new FuzzyQuery(new Term(field, token.termText()));
+				Payload p = token.getPayload();
+				if ( p != null ) {
+					token.setPayload((Payload) p.clone());
+				}
+				Query q = new FuzzyQuery(new Term(field, token.term()));
 				rootQuery.add(q, Occur.SHOULD);
 			}
 		} catch ( IOException e ) {
@@ -1109,17 +1133,20 @@ public class LuceneSearchService implements LuceneService {
 		try {
 			searcher = getIndexSearcher(data);
 			long start = System.currentTimeMillis();
-			Hits hits = searcher.search(query);
+			// TODO instead of DEFAULT_MAX_SEARCH_RESULTS make configurable property, or method arg
+			TopDocCollector col = new TopDocCollector(DEFAULT_MAX_SEARCH_RESULTS);
+			searcher.search(query, col);
 			long time = System.currentTimeMillis() - start;
 			if ( log.isDebugEnabled() ) {
 				log.debug("Lucene query [" +query
-						+"] returned " +hits.length() +" in " +time +"ms");
+						+"] returned " +col.getTotalHits() +" in " +time +"ms");
 			}
 			if ( traceLog.isDebugEnabled() ) {
 				traceLog.debug(TraceOp.QUERY +"Lucene query [" +query
-						+"] returned " +hits.length() +" in " +time +"ms");
+						+"] returned " +col.getTotalHits() +" in " +time +"ms");
 			}
-			queryOp.doSearcherOp(type, searcher, query, hits);
+		
+			queryOp.doSearcherOp(type, searcher, query, col);
 		} catch ( Exception e ) {
 			log.error("Lucene exception during search on [" +type +"]", e);
 			throw new RuntimeException("Exception searching index [" +type +"]", e);
@@ -1154,7 +1181,7 @@ public class LuceneSearchService implements LuceneService {
 
 			// perform update op
 			writer = new IndexWriter(data.dir,
-					data.plugin.getAnalyzer(), create);
+					data.plugin.getAnalyzer(), create, MaxFieldLength.UNLIMITED);
 			if ( traceLog.isInfoEnabled() ) {
 				traceLog.info(TraceOp.CONCURRENCY +"Created new IndexWriter " 
 						+writer +" for index [" +type +"]");
@@ -1269,7 +1296,7 @@ public class LuceneSearchService implements LuceneService {
 		lock.lock();
 		try {
 			writer = new IndexWriter(data.dir,
-					data.plugin.getAnalyzer(), create);
+					data.plugin.getAnalyzer(), create, MaxFieldLength.UNLIMITED);
 			if ( traceLog.isInfoEnabled() ) {
 				traceLog.info(TraceOp.CONCURRENCY +"Created new IndexWriter " 
 						+writer +" for index [" +type +"]");
