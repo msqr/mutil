@@ -2,24 +2,6 @@
 <classpath>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry kind="lib" path="lib/spring-1.2.8.jar" sourcepath="lib/spring-1.2.8-src.jar"/>
-	<classpathentry kind="lib" path="lib/log4j-1.2.13.jar"/>
-	<classpathentry kind="lib" path="lib/glf.jar"/>
-	<classpathentry kind="lib" path="lib/commons-logging-1.0.4.jar"/>
-	<classpathentry kind="lib" path="lib/cglib-2.1.jar"/>
-	<classpathentry kind="lib" path="lib/asm-attrs.jar"/>
-	<classpathentry kind="lib" path="lib/asm.jar"/>
-	<classpathentry kind="lib" path="lib/antlr-2.7.6.jar"/>
-	<classpathentry kind="lib" path="lib/hibernate-2.1.8.jar"/>
-	<classpathentry kind="lib" path="lib/ehcache-1.2.4.jar"/>
-	<classpathentry kind="lib" path="lib/hibernate-3.2.1.jar"/>
-	<classpathentry kind="lib" path="lib/commons-collections-2.1.1.jar"/>
-	<classpathentry kind="lib" path="lib/commons-lang-2.2.jar"/>
-	<classpathentry kind="lib" path="lib/commons-beanutils-core-1.7.0.jar"/>
-	<classpathentry kind="lib" path="lib/j2ee/jstl.jar"/>
-	<classpathentry kind="lib" path="lib/j2ee/servlet-api.jar"/>
-	<classpathentry kind="lib" path="lib/j2ee/jsp-api.jar"/>
-	<classpathentry kind="lib" path="lib/lucene/lucene-core-2.4.1.jar" sourcepath="lib/lucene/lucene-2.4.1-src.jar"/>
-	<classpathentry kind="lib" path="lib/lucene/lucene-snowball-2.4.1.jar"/>
+	<classpathentry kind="con" path="org.apache.ivyde.eclipse.cpcontainer.IVYDE_CONTAINER/?project=mutil&amp;ivyXmlPath=ivy.xml&amp;confs=*&amp;ivySettingsPath=%24%7Bworkspace_loc%3Amutil%2Flib%2Fivysettings.xml%7D&amp;loadSettingsOnDemand=false&amp;propertyFiles="/>
 	<classpathentry kind="output" path="build/eclipse"/>
 </classpath>
