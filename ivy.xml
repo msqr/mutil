@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ivy-module version="2.0">
+	<info organisation="msm" module="mutil"/>
+	<configurations>
+		<conf name="compile" visibility="public" description="Build dependencies"/>
+		<conf name="runtime" visibility="public" description="mutil"/>
+		<conf name="test" visibility="private" description="unit testing" extends="compile"/>
+	</configurations>
+	<dependencies defaultconfmapping="test->runtime(default);runtime->runtime(default);compile->compile(default)">
+		<dependency org="net.sf.ehcache" name="ehcache" rev="1.6.2">
+			<artifact name="ehcache" type="jar" />
+		</dependency>
+		<dependency org="org.apache.lucene" name="lucene-core" rev="2.4.1">
+    		<artifact name="lucene-core" type="jar" />
+		</dependency>
+		
+		<!-- JPA/JDBC stuff -->
+		<dependency org="org.eclipse.persistence" name="javax.persistence" rev="2.0.0">
+    		<artifact name="javax.persistence" type="jar" />
+		</dependency>
+		<dependency org="org.eclipse.persistence" name="eclipselink" rev="2.3.2">
+			<artifact name="eclipselink" type="jar"/>
+		</dependency>
+		<dependency org="org.hibernate" name="hibernate-core" rev="3.3.2.GA" >
+    		<artifact name="hibernate-core" type="jar" />
+		</dependency>
+		<dependency org="org.hibernate" name="hibernate-ehcache" rev="3.3.2.GA" >
+			<artifact name="hibernate-ehcache" type="jar" />
+		</dependency>
+		<!--dependency org="javax.xml.bind" name="jaxb-api" rev="2.2.6" >
+    		<artifact name="jaxb-api" type="jar" />
+		</dependency-->
+		<dependency org="org.apache.derby" name="derby" rev="10.8.2.2" conf="test">
+    		<artifact name="derby" type="jar" />
+		</dependency>
+		<dependency org="mysql" name="mysql-connector-java" rev="5.1.18" conf="test">
+    		<artifact name="mysql-connector-java" type="jar" />
+		</dependency>
+		<dependency org="postgresql" name="postgresql" rev="9.1-901-1.jdbc4" conf="test">
+    		<artifact name="postgresql" type="jar" />
+		</dependency>
+		
+		<!-- Logging -->
+		<dependency org="log4j" name="log4j" rev="1.2.16">
+    		<artifact name="log4j" type="jar" />
+		</dependency>
+		<dependency org="org.slf4j" name="slf4j-api" rev="1.6.4">
+    		<artifact name="slf4j-api" type="jar" />
+		</dependency>
+		<dependency org="org.slf4j" name="slf4j-log4j12" rev="1.6.4">
+		    <artifact name="slf4j-log4j12" type="jar" />
+		</dependency>
+		<dependency org="org.slf4j" name="jcl-over-slf4j" rev="1.6.4">
+    		<artifact name="jcl-over-slf4j" type="jar" />
+		</dependency>
+		
+		<!-- AspectJ -->
+		<dependency org="org.aspectj" name="aspectjweaver" rev="1.6.12" >
+    		<artifact name="aspectjweaver" type="jar" />
+		</dependency>
+		
+		<!-- Spring -->
+		<dependency org="org.springframework" name="spring-aop" rev="3.1.1.RELEASE">
+    		<artifact name="spring-aop" type="jar" />
+		</dependency>
+		<dependency org="org.springframework" name="spring-context" rev="3.1.1.RELEASE">
+    		<artifact name="spring-context" type="jar" />
+		</dependency>
+		<dependency org="org.springframework" name="spring-core" rev="3.1.1.RELEASE">
+    		<artifact name="spring-core" type="jar" />
+		</dependency>
+		<dependency org="org.springframework" name="spring-orm" rev="3.1.1.RELEASE">
+    		<artifact name="spring-orm" type="jar" />
+		</dependency>
+		<dependency org="org.springframework" name="spring-webmvc" rev="3.1.1.RELEASE">
+    		<artifact name="spring-webmvc" type="jar" />
+		</dependency>
+		
+		<!-- JAXB -->
+		<dependency org="org.jvnet.jaxb2_commons" name="jaxb2-basics-runtime" rev="0.6.3" >
+    		<artifact name="jaxb2-basics-runtime" type="jar" />
+		</dependency>
+		
+		<!-- Web runtime -->
+		<dependency org="javax.servlet.jsp" name="javax.servlet.jsp-api" rev="2.2.1" >
+    		<artifact name="javax.servlet.jsp-api" type="jar" />
+		</dependency>
+		<dependency org="javax.servlet.jsp.jstl" name="javax.servlet.jsp.jstl-api" rev="1.2.1" >
+    		<artifact name="javax.servlet.jsp.jstl-api" type="jar" />
+		</dependency>
+		<!--dependency org="org.eclipse.jetty.orbit" name="javax.servlet.jsp" rev="2.2.0.v201112011158" conf="compile">
+    		<artifact name="javax.servlet.jsp" type="orbit" ext="jar" />
+		</dependency>
+		<dependency org="org.eclipse.jetty.orbit" name="javax.servlet" rev="3.0.0.v201112011016" conf="compile">
+			<artifact name="javax.servlet" type="orbit" ext="jar" />
+		</dependency-->
+		
+		<!-- Jackson JSON -->
+		<dependency org="org.codehaus.jackson" name="jackson-core-asl" rev="1.9.5">
+			<artifact name="jackson-core-asl" type="jar" />
+		</dependency>
+		<dependency org="org.codehaus.jackson" name="jackson-mapper-asl" rev="1.9.5">
+    		<artifact name="jackson-mapper-asl" type="jar" />
+		</dependency>
+		
+		<!-- Specific versions of some libraries -->
+		<dependency org="javax.activation" name="activation" rev="1.1.1" >
+			<artifact name="activation" type="jar" />
+		</dependency>
+		<dependency org="asm" name="asm" rev="3.3.1"/>
+		<dependency org="cglib" name="cglib" rev="2.2.2"/>
+
+		<!-- Apache Commons -->
+		<dependency org="commons-beanutils" name="commons-beanutils" rev="1.8.3"/>
+		<dependency org="commons-collections" name="commons-collections" rev="3.2.1"/>
+		<dependency org="commons-digester" name="commons-digester" rev="2.1"/>
+		<dependency org="commons-codec" name="commons-codec" rev="1.6" >
+    		<artifact name="commons-codec" type="jar" />
+		</dependency>
+		<dependency org="org.mod4j.org.apache.commons" name="lang" rev="2.1.0" >
+			<artifact name="lang" type="jar" />
+		</dependency>
+		
+		<!-- Unit test support -->
+		<dependency org="org.testng" name="testng" rev="6.5.1" conf="test">
+			<artifact name="testng" type="jar" />
+		</dependency>
+		<dependency org="org.springframework" name="spring-test" rev="3.1.1.RELEASE" conf="test">
+		    <artifact name="spring-test" type="jar" />
+		</dependency>
+	</dependencies>
+</ivy-module>

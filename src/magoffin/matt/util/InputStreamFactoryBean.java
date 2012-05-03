@@ -37,22 +37,21 @@ import org.springframework.core.io.Resource;
  * @author matt.magoffin
  * @version $Revision: 1.2 $ $Date: 2007/07/12 09:09:55 $
  */
-public class InputStreamFactoryBean implements FactoryBean {
+public class InputStreamFactoryBean implements FactoryBean<InputStream> {
 	
 	private Resource resource;
 
 	/* (non-Javadoc)
 	 * @see org.springframework.beans.factory.FactoryBean#getObject()
 	 */
-	public Object getObject() throws Exception {
+	public InputStream getObject() throws Exception {
 		return resource.getInputStream();
 	}
 
 	/* (non-Javadoc)
 	 * @see org.springframework.beans.factory.FactoryBean#getObjectType()
 	 */
-	@SuppressWarnings("unchecked")
-	public Class getObjectType() {
+	public Class<? extends InputStream> getObjectType() {
 		return InputStream.class;
 	}
 

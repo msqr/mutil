@@ -120,10 +120,9 @@ extends HibernateDaoSupport implements GenericDao<T,PK> {
 	/* (non-Javadoc)
 	 * @see magoffin.matt.dao.GenericDao#get(PK)
 	 */
-	@SuppressWarnings("unchecked")
 	public T get(PK id) {
 		try {
-			return (T)getHibernateTemplate().load(type,id);
+			return getHibernateTemplate().load(type,id);
 		} catch ( ObjectRetrievalFailureException e ) {
 			log.warn("Object not found by primary key [" 
 					+id +"]: " +e.getMessage());
@@ -164,13 +163,12 @@ extends HibernateDaoSupport implements GenericDao<T,PK> {
 	 * Update a persisted domain object.
 	 * @param domainObject the domain object to update
 	 */
-	@SuppressWarnings("unchecked")
 	protected void update(T domainObject) {
 		boolean merge = false;
 		if ( updateMode == UpdateMode.MERGE ) {
 			merge = true;
 		} else if ( updateMode == UpdateMode.CONDITIONALLY_MERGE ) {
-			T persistenObject = (T)getHibernateTemplate().get(type, 
+			T persistenObject = getHibernateTemplate().get(type, 
 					getPrimaryKey(domainObject));
 			if ( persistenObject != domainObject ) {
 				merge = true;
@@ -233,8 +231,8 @@ extends HibernateDaoSupport implements GenericDao<T,PK> {
 	protected List<T> findByNamedQuery(final String queryName, 
 			final Map<String, Object> parameters, 
 			final int page, final int pageSize) {
-		return getHibernateTemplate().executeFind(new HibernateCallback() {
-			public Object doInHibernate(Session session) throws HibernateException, SQLException {
+		return getHibernateTemplate().executeFind(new HibernateCallback<List<T>>() {
+			public List<T> doInHibernate(Session session) throws HibernateException, SQLException {
 				Query query = session.getNamedQuery(queryName);
 				if ( parameters != null ) {
 					for ( String parameterName : parameters.keySet() ) {
@@ -263,8 +261,8 @@ extends HibernateDaoSupport implements GenericDao<T,PK> {
 	@SuppressWarnings("unchecked")
 	protected List<T> findByNamedQuery(final String queryName, final Object[] parameters, 
 			final int page, final int pageSize) {
-		return getHibernateTemplate().executeFind(new HibernateCallback() {
-			public Object doInHibernate(Session session) throws HibernateException, SQLException {
+		return getHibernateTemplate().executeFind(new HibernateCallback<List<T>>() {
+			public List<T> doInHibernate(Session session) throws HibernateException, SQLException {
 				Query query = session.getNamedQuery(queryName);
 				if ( parameters != null ) {
 					for ( int i = 0; i < parameters.length; i++ ) {
@@ -288,10 +286,10 @@ extends HibernateDaoSupport implements GenericDao<T,PK> {
 	 */
 	protected Integer executeNamedQueryBatchCallback(final String queryName, 
 			final Map<String, Object> parameters, final BatchCallback<T> callback) {
-		Integer numProcessed = (Integer)getHibernateTemplate().execute(
-			new HibernateCallback() {
+		return getHibernateTemplate().execute(
+			new HibernateCallback<Integer>() {
 				@SuppressWarnings("unchecked")
-				public Object doInHibernate(Session session) 
+				public Integer doInHibernate(Session session) 
 				throws HibernateException, SQLException {
 					Query q = session.getNamedQuery(queryName);
 					if ( parameters != null ) {
@@ -335,8 +333,7 @@ extends HibernateDaoSupport implements GenericDao<T,PK> {
 					
 					return count;
 				}
-			}, true);
-		return numProcessed;
+			});
 	}
 	
 	/**
@@ -412,10 +409,10 @@ extends HibernateDaoSupport implements GenericDao<T,PK> {
 			final CriteriaBuilder criteriaBuilder, 
 			final BatchCallback<T> callback, 
 			final BatchOptions options) {
-		Integer numProcessed = (Integer)getHibernateTemplate().execute(
-				new HibernateCallback() {
+		return getHibernateTemplate().execute(
+				new HibernateCallback<Integer>() {
 					@SuppressWarnings("unchecked")
-					public Object doInHibernate(Session session) 
+					public Integer doInHibernate(Session session) 
 					throws HibernateException, SQLException {
 						Criteria criteria = session.createCriteria(type);
 						criteria.setFetchSize(options.getBatchSize());
@@ -456,8 +453,7 @@ extends HibernateDaoSupport implements GenericDao<T,PK> {
 						
 						return count;
 					}
-				}, true);
-		return numProcessed;
+				});
 	}
 
 	/**
