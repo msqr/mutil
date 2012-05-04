@@ -28,7 +28,6 @@ package magoffin.matt.dao;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
-
 import magoffin.matt.dao.BatchableDao.BatchMode;
 import magoffin.matt.dao.BatchableDao.BatchOptions;
 
@@ -91,30 +90,22 @@ public class BasicBatchOptions implements BatchOptions {
 		this.parameters = parameters;
 	}
 
-	/* (non-Javadoc)
-	 * @see magoffin.matt.dao.BatchableDao.BatchOptions#getName()
-	 */
+	@Override
 	public String getName() {
 		return name;
 	}
 
-	/* (non-Javadoc)
-	 * @see magoffin.matt.dao.BatchableDao.BatchOptions#getBatchSize()
-	 */
+	@Override
 	public int getBatchSize() {
 		return batchSize;
 	}
 
-	/* (non-Javadoc)
-	 * @see magoffin.matt.dao.BatchableDao.BatchOptions#getMode()
-	 */
+	@Override
 	public BatchMode getMode() {
 		return mode;
 	}
 
-	/* (non-Javadoc)
-	 * @see magoffin.matt.dao.BatchableDao.BatchOptions#getParameters()
-	 */
+	@Override
 	public Map<String, Object> getParameters() {
 		return parameters;
 	}

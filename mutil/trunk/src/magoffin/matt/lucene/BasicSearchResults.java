@@ -29,9 +29,6 @@ package magoffin.matt.lucene;
 import java.util.Collections;
 import java.util.List;
 
-import magoffin.matt.lucene.SearchMatch;
-import magoffin.matt.lucene.SearchResults;
-
 /**
  * Basic implementation of SearchResults.
  * 
@@ -62,16 +59,12 @@ public class BasicSearchResults implements SearchResults {
 		this.totalMatches = totalMatches;
 	}
 
-	/* (non-Javadoc)
-	 * @see magoffin.matt.lucene.SearchResults#getMatches()
-	 */
+	@Override
 	public List<SearchMatch> getMatches() {
 		return matches;
 	}
 
-	/* (non-Javadoc)
-	 * @see magoffin.matt.lucene.SearchResults#getTotalMatches()
-	 */
+	@Override
 	public int getTotalMatches() {
 		return totalMatches;
 	}

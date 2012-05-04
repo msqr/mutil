@@ -28,9 +28,7 @@ package magoffin.matt.util;
 
 import java.net.URL;
 import java.util.Properties;
-
 import net.sf.ehcache.CacheManager;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hibernate.cache.Cache;
@@ -76,6 +74,7 @@ public class Hibernate3EhCacheProvider implements CacheProvider {
 	 * @throws CacheException
 	 *             inter alia, if a cache of the same name already exists
 	 */
+	@Override
 	public Cache buildCache(String name, Properties properties)
 			throws CacheException {
 		try {
@@ -93,9 +92,7 @@ public class Hibernate3EhCacheProvider implements CacheProvider {
 		}
 	}
 
-	/**
-	 * Returns the next timestamp.
-	 */
+	@Override
 	public long nextTimestamp() {
 		return Timestamper.next();
 	}
@@ -107,6 +104,7 @@ public class Hibernate3EhCacheProvider implements CacheProvider {
 	 * @param properties
 	 *            current configuration settings.
 	 */
+	@Override
 	public void start(Properties properties) throws CacheException {
 		if (manager != null) {
 			log
@@ -155,6 +153,7 @@ public class Hibernate3EhCacheProvider implements CacheProvider {
 	 * Callback to perform any necessary cleanup of the underlying cache
 	 * implementation during SessionFactory.close().
 	 */
+	@Override
 	public void stop() {
 		if (manager != null) {
 			manager.shutdown();
@@ -162,6 +161,7 @@ public class Hibernate3EhCacheProvider implements CacheProvider {
 		}
 	}
 
+	@Override
 	public boolean isMinimalPutsEnabledByDefault() {
 		return false;
 	}

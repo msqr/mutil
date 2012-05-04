@@ -24,10 +24,9 @@
 
 package magoffin.matt.lucene;
 
+import magoffin.matt.lucene.LucenePlugin.LuceneIndexConfig;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.LogMergePolicy;
-
-import magoffin.matt.lucene.LucenePlugin.LuceneIndexConfig;
 
 /**
  * Basic implementation of the LuceneIndexConfig API.
@@ -58,16 +57,12 @@ public class BasicIndexConfig implements LuceneIndexConfig {
 		this.mergeFactor = mergeFactor;
 	}
 
-	/* (non-Javadoc)
-	 * @see magoffin.matt.lucene.LucenePlugin.LuceneIndexConfig#getMinMergeDocs()
-	 */
+	@Override
 	public int getMinMergeDocs() {
 		return minMergeDocs;
 	}
 
-	/* (non-Javadoc)
-	 * @see magoffin.matt.lucene.LucenePlugin.LuceneIndexConfig#getMergeFactor()
-	 */
+	@Override
 	public int getMergeFactor() {
 		return mergeFactor;
 	}

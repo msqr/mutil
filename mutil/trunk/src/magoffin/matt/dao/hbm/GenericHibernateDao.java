@@ -31,10 +31,10 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
 
-import magoffin.matt.dao.GenericDao;
 import magoffin.matt.dao.BatchableDao.BatchCallback;
 import magoffin.matt.dao.BatchableDao.BatchCallbackResult;
 import magoffin.matt.dao.BatchableDao.BatchOptions;
+import magoffin.matt.dao.GenericDao;
 
 import org.apache.log4j.Logger;
 import org.hibernate.CacheMode;
@@ -87,7 +87,7 @@ extends HibernateDaoSupport implements GenericDao<T,PK> {
 	/** The default batch flush count. */
 	public static final int DEFAULT_BATCH_FLUSH_COUNT = 25;
 	
-	private Class<? extends T> type;
+	private final Class<? extends T> type;
 	private UpdateMode updateMode = UpdateMode.UPDATE;
 	private int batchFlushCount = DEFAULT_BATCH_FLUSH_COUNT;
 	
@@ -110,16 +110,12 @@ extends HibernateDaoSupport implements GenericDao<T,PK> {
 		return this.type;
 	}
 
-	/* (non-Javadoc)
-	 * @see magoffin.matt.dao.GenericDao#delete(T)
-	 */
+	@Override
 	public void delete(T domainObject) {
 		getHibernateTemplate().delete(domainObject);
 	}
 
-	/* (non-Javadoc)
-	 * @see magoffin.matt.dao.GenericDao#get(PK)
-	 */
+	@Override
 	public T get(PK id) {
 		try {
 			return getHibernateTemplate().load(type,id);
@@ -130,9 +126,7 @@ extends HibernateDaoSupport implements GenericDao<T,PK> {
 		return null;
 	}
 
-	/* (non-Javadoc)
-	 * @see magoffin.matt.dao.GenericDao#store(T)
-	 */
+	@Override
 	public final PK store(T domainObject) {
 		PK primaryKey = getPrimaryKey(domainObject);
 		if ( primaryKey == null ) {
@@ -232,6 +226,7 @@ extends HibernateDaoSupport implements GenericDao<T,PK> {
 			final Map<String, Object> parameters, 
 			final int page, final int pageSize) {
 		return getHibernateTemplate().executeFind(new HibernateCallback<List<T>>() {
+					@Override
 			public List<T> doInHibernate(Session session) throws HibernateException, SQLException {
 				Query query = session.getNamedQuery(queryName);
 				if ( parameters != null ) {
@@ -262,6 +257,7 @@ extends HibernateDaoSupport implements GenericDao<T,PK> {
 	protected List<T> findByNamedQuery(final String queryName, final Object[] parameters, 
 			final int page, final int pageSize) {
 		return getHibernateTemplate().executeFind(new HibernateCallback<List<T>>() {
+					@Override
 			public List<T> doInHibernate(Session session) throws HibernateException, SQLException {
 				Query query = session.getNamedQuery(queryName);
 				if ( parameters != null ) {
@@ -289,6 +285,7 @@ extends HibernateDaoSupport implements GenericDao<T,PK> {
 		return getHibernateTemplate().execute(
 			new HibernateCallback<Integer>() {
 				@SuppressWarnings("unchecked")
+			@Override
 				public Integer doInHibernate(Session session) 
 				throws HibernateException, SQLException {
 					Query q = session.getNamedQuery(queryName);
@@ -412,6 +409,7 @@ extends HibernateDaoSupport implements GenericDao<T,PK> {
 		return getHibernateTemplate().execute(
 				new HibernateCallback<Integer>() {
 					@SuppressWarnings("unchecked")
+			@Override
 					public Integer doInHibernate(Session session) 
 					throws HibernateException, SQLException {
 						Criteria criteria = session.createCriteria(type);

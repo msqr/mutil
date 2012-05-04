@@ -55,13 +55,12 @@ public class MultiDateFormat implements ThreadSafeDateFormat {
 
 	private ThreadSafeDateFormat[] delegates = new ThreadSafeDateFormat[0];
 
-	/* (non-Javadoc)
-	 * @see magoffin.matt.util.ThreadSafeDateFormat#getPattern()
-	 */
+	@Override
 	public String getPattern() {
 		return delegates[0].getPattern();
 	}
 
+	@Override
 	public String format(Date date) {
 		for ( ThreadSafeDateFormat f : delegates ) {
 			try {
@@ -76,6 +75,7 @@ public class MultiDateFormat implements ThreadSafeDateFormat {
 		throw new RuntimeException("Could not format date with any delgate");
 	}
 
+	@Override
 	public String format(Date date, TimeZone zone) {
 		for ( ThreadSafeDateFormat f : delegates ) {
 			try {
@@ -90,6 +90,7 @@ public class MultiDateFormat implements ThreadSafeDateFormat {
 		throw new RuntimeException("Could not format date with any delgate");
 	}
 
+	@Override
 	public String format(Calendar date) {
 		for ( ThreadSafeDateFormat f : delegates ) {
 			try {
@@ -104,6 +105,7 @@ public class MultiDateFormat implements ThreadSafeDateFormat {
 		throw new RuntimeException("Could not format date with any delgate");
 	}
 
+	@Override
 	public String format(Calendar date, TimeZone zone) {
 		for ( ThreadSafeDateFormat f : delegates ) {
 			try {
@@ -118,6 +120,7 @@ public class MultiDateFormat implements ThreadSafeDateFormat {
 		throw new RuntimeException("Could not format date with any delgate");
 	}
 
+	@Override
 	public Calendar getCalendarInstance() {
 		for ( ThreadSafeDateFormat f : delegates ) {
 			try {
@@ -132,6 +135,7 @@ public class MultiDateFormat implements ThreadSafeDateFormat {
 		throw new RuntimeException("Could not get Calendar from any delgate");
 	}
 
+	@Override
 	public Calendar parseCalendar(String dateStr) {
 		for ( ThreadSafeDateFormat f : delegates ) {
 			try {
@@ -146,6 +150,7 @@ public class MultiDateFormat implements ThreadSafeDateFormat {
 		throw new RuntimeException("Could not parse Calendar with any delgate");
 	}
 
+	@Override
 	public Calendar parseCalendar(String dateStr, TimeZone zone) {
 		for ( ThreadSafeDateFormat f : delegates ) {
 			try {
@@ -160,6 +165,7 @@ public class MultiDateFormat implements ThreadSafeDateFormat {
 		throw new RuntimeException("Could not parse Calendar with any delgate");
 	}
 
+	@Override
 	public Date parseDate(String dateStr) {
 		for ( ThreadSafeDateFormat f : delegates ) {
 			try {

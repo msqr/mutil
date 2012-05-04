@@ -29,7 +29,6 @@ package magoffin.matt.util;
 import java.beans.PropertyEditorSupport;
 import java.io.IOException;
 import java.io.InputStream;
-
 import org.springframework.web.multipart.MultipartFile;
 
 /**
@@ -66,15 +65,23 @@ public class TemporaryFileMultipartFileEditor extends PropertyEditorSupport {
 				throw new IllegalArgumentException("MultipartFile may not be null");
 			}
 			super.setValue(new TemporaryFile() {
+
+				@Override
 				public InputStream getInputStream() throws IOException {
 					return multipartFile.getInputStream();
 				}
+
+				@Override
 				public String getName() {
 					return multipartFile.getOriginalFilename();
 				}
+
+				@Override
 				public String getContentType() {
 					return multipartFile.getContentType();
 				}
+
+				@Override
 				public long getSize() {
 					return multipartFile.getSize();
 				}
