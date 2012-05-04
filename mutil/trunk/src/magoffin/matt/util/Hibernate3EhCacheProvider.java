@@ -52,6 +52,7 @@ import org.hibernate.util.StringHelper;
  * @author Matt Magoffin (spamsqr@msqr.us)
  * @version $Revision: 1.2 $ $Date: 2007/09/07 08:33:54 $
  */
+@SuppressWarnings("deprecation")
 public class Hibernate3EhCacheProvider implements CacheProvider {
 
 	private static final Log log = LogFactory.getLog(EhCacheProvider.class);
