@@ -27,7 +27,6 @@ package magoffin.matt.util;
 import java.util.Collection;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
-
 import org.apache.log4j.Logger;
 
 /**
@@ -42,8 +41,8 @@ public abstract class BaseQueueThread<E> implements Runnable {
 	/** Class logger. */
 	protected final Logger queueLog = Logger.getLogger(getClass());
 
-	private BlockingQueue<E> queue;
-	private E stopItem;
+	private final BlockingQueue<E> queue;
+	private final E stopItem;
 	private boolean keepGoing;
 	private boolean started;
 
@@ -97,9 +96,7 @@ public abstract class BaseQueueThread<E> implements Runnable {
 		// nothing here
 	}
 	
-	/* (non-Javadoc)
-	 * @see java.lang.Runnable#run()
-	 */
+	@Override
 	public final void run() {
 		started = true;
 		

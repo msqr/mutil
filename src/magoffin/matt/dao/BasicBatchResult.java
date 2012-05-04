@@ -53,9 +53,7 @@ public class BasicBatchResult implements BatchResult {
 		this.numProcessed = numProcessed;
 	}
 
-	/* (non-Javadoc)
-	 * @see magoffin.matt.dao.BatchableDao.BatchResult#numProcessed()
-	 */
+	@Override
 	public int numProcessed() {
 		return numProcessed;
 	}

@@ -57,12 +57,10 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
 import magoffin.matt.lucene.IndexEvent.EventType;
 import magoffin.matt.util.BaseQueueThread;
 import magoffin.matt.util.FastThreadSafeDateFormat;
 import magoffin.matt.util.ThreadSafeDateFormat;
-
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
 import org.apache.commons.collections.CollectionUtils;
@@ -73,12 +71,13 @@ import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.IndexWriter;
+import org.apache.lucene.index.IndexWriter.MaxFieldLength;
 import org.apache.lucene.index.Payload;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.index.TermEnum;
-import org.apache.lucene.index.IndexWriter.MaxFieldLength;
 import org.apache.lucene.queryParser.ParseException;
 import org.apache.lucene.queryParser.QueryParser;
+import org.apache.lucene.search.BooleanClause.Occur;
 import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.FuzzyQuery;
 import org.apache.lucene.search.IndexSearcher;
@@ -86,7 +85,6 @@ import org.apache.lucene.search.Query;
 import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.search.TopDocCollector;
-import org.apache.lucene.search.BooleanClause.Occur;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
 import org.springframework.orm.ObjectRetrievalFailureException;
@@ -195,10 +193,12 @@ public class LuceneSearchService implements LuceneService {
 		private int totalMatches;
 		private List<Map<String, String[]>> results;
 
+		@Override
 		public List<Map<String, String[]>> getResults() {
 			return results;
 		}
 
+		@Override
 		public int getTotalMatches() {
 			return totalMatches;
 		}
@@ -222,13 +222,13 @@ public class LuceneSearchService implements LuceneService {
 	private boolean throwExceptionDuringInitialize = false;
 	
 	private List<LucenePlugin> plugins;
-	private Set<IndexListener> indexEventListeners = new LinkedHashSet<IndexListener>();
+	private final Set<IndexListener> indexEventListeners = new LinkedHashSet<IndexListener>();
 	
 	/* The following are internally initialized fields */
 	
 	private IndexQueueThread indexQueue = null;
 	private File indexDirectory = null;
-	private Map<String, IndexData> indexDataMap = new HashMap<String, IndexData>();
+	private final Map<String, IndexData> indexDataMap = new HashMap<String, IndexData>();
 	private Timer indexQueueFlushTimer = null;
 	
 	private ThreadSafeDateFormat dayDateFormat = new FastThreadSafeDateFormat(
@@ -236,7 +236,7 @@ public class LuceneSearchService implements LuceneService {
 	private ThreadSafeDateFormat monthDateFormat = new FastThreadSafeDateFormat(
 			INDEX_DATE_FORMAT_MONTH_PATTERN, TimeZone.getDefault());
 	
-	private List<DiscardedIndexReader> discardedIndexReaders = 
+	private final List<DiscardedIndexReader> discardedIndexReaders = 
 		Collections.synchronizedList(new LinkedList<DiscardedIndexReader>());
 	private Timer discardedIndexReaderProcessorTimer = null;
 	private boolean finished = false;
@@ -468,9 +468,7 @@ public class LuceneSearchService implements LuceneService {
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see magoffin.matt.lucene.LuceneService#indexObject(java.lang.String, java.lang.Object)
-	 */
+	@Override
 	public void indexObject(String type, Object object) {
 		if ( indexQueue == null ) {
 			log.warn("Unable to index object [" +object 
@@ -492,9 +490,7 @@ public class LuceneSearchService implements LuceneService {
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see magoffin.matt.lucene.LuceneService#indexObjectById(java.lang.String, java.lang.Long)
-	 */
+	@Override
 	public void indexObjectById(String type, Object objectId) {
 		if ( indexQueue == null ) {
 			log.warn("Unable to index objectId [" +objectId 
@@ -516,9 +512,7 @@ public class LuceneSearchService implements LuceneService {
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see magoffin.matt.lucene.LuceneService#deleteObjectById(java.lang.String, java.lang.Object)
-	 */
+	@Override
 	public void deleteObjectById(final String type, final Object objectId) {
 		if ( indexQueue == null ) {
 			log.warn("Unable to delete by objectId [" +objectId 
@@ -540,9 +534,7 @@ public class LuceneSearchService implements LuceneService {
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see magoffin.matt.lucene.LuceneService#reindex(java.lang.String)
-	 */
+	@Override
 	public IndexStatusCallback reindex(final String type) {
 		if ( indexQueue == null ) {
 			log.warn("Unable to reindex index [" +type 
@@ -573,9 +565,7 @@ public class LuceneSearchService implements LuceneService {
 		return callback;
 	}
 
-	/* (non-Javadoc)
-	 * @see magoffin.matt.lucene.LuceneService#find(java.lang.String, magoffin.matt.lucene.SearchCriteria)
-	 */
+	@Override
 	public SearchResults find(String index, SearchCriteria criteria) {
 		IndexData indexData = this.indexDataMap.get(index);
 		if ( criteria.isCountOnly() ) {
@@ -583,6 +573,8 @@ public class LuceneSearchService implements LuceneService {
 			if ( o instanceof Query ) {
 				final BasicSearchResults results = new BasicSearchResults();
 				doIndexQueryOp(index, (Query)o, false, new IndexQueryOp() {
+
+					@Override
 					public void doSearcherOp(String type, IndexSearcher searcher, 
 							Query query, TopDocCollector hits) throws IOException {
 						results.setTotalMatches(hits.getTotalHits());
@@ -595,9 +587,7 @@ public class LuceneSearchService implements LuceneService {
 		return indexData.plugin.find(criteria);
 	}
 
-	/* (non-Javadoc)
-	 * @see magoffin.matt.lucene.LuceneService#build(java.lang.String, org.apache.lucene.search.TopDocCollector, int, int)
-	 */
+	@Override
 	public List<SearchMatch> build(String index, final TopDocCollector hits, final int start, final int end) {
 		final LucenePlugin plugin = this.indexDataMap.get(index).plugin;
 		final int length = end > start ? end - start : 0;
@@ -605,6 +595,8 @@ public class LuceneSearchService implements LuceneService {
 		final int hitLength = docs.length;
 		final List<SearchMatch> searchMatches = new ArrayList<SearchMatch>(length);
 		doIndexSearcherOp(index, new IndexSearcherOp() {
+
+			@Override
 			public void doSearcherOp(String type, IndexSearcher searcher)
 					throws IOException {
 				for ( int i = start; i < end && i < hitLength; i++ ) {
@@ -617,13 +609,12 @@ public class LuceneSearchService implements LuceneService {
 		return searchMatches;
 	}
 
-	/* (non-Javadoc)
-	 * @see magoffin.matt.lucene.LuceneService#search(magoffin.matt.lucene.LuceneService.String, java.lang.String, magoffin.matt.lucene.LuceneService.LuceneSearchResultHandler)
-	 */
+	@Override
 	public void search(String index, String query, final LuceneSearchResultHandler handler) {
 		Query luceneQuery = parseQuery(index, query);
 		doIndexQueryOp(index, luceneQuery, ASYNCHRONOUS, new IndexQueryOp() {
 			@SuppressWarnings("unchecked")
+			@Override
 			public void doSearcherOp(String indexType, IndexSearcher searcher, 
 					Query myQuery, TopDocCollector hits) throws IOException {
 				int numHits = hits == null ? 0 : hits.getTotalHits();
@@ -647,12 +638,14 @@ public class LuceneSearchService implements LuceneService {
 		});
 	}
 
+	@Override
 	public LuceneSearchResults search(String type, String query,  
 			final int maxResults, final int pageSize, final int page) {
 		Query luceneQuery = parseQuery(type, query);
 		final LuceneSearchResultsImpl results = new LuceneSearchResultsImpl();
 		doIndexQueryOp(type, luceneQuery, ASYNCHRONOUS, new IndexQueryOp() {
 			@SuppressWarnings({ "unchecked" })
+			@Override
 			public void doSearcherOp(String indexType, IndexSearcher searcher, 
 					Query myQuery, TopDocCollector hits) throws IOException {
 				int numHits = hits == null ? 0 : hits.getTotalHits();
@@ -721,6 +714,7 @@ public class LuceneSearchService implements LuceneService {
 	 * @param field the field this query is searching
 	 * @param type the index type
 	 */
+	@Override
 	public void addTokenizedTermQuery(BooleanQuery rootQuery, String query, 
 			String field, String type) {
 		StringReader reader = new StringReader(query);
@@ -754,6 +748,7 @@ public class LuceneSearchService implements LuceneService {
 	 * @param field the field this query is searching
 	 * @param type the index type
 	 */
+	@Override
 	public void addTokenizedFuzzyQuery(BooleanQuery rootQuery, String query, 
 			String field, String type) {
 		StringReader reader = new StringReader(query);
@@ -779,6 +774,7 @@ public class LuceneSearchService implements LuceneService {
 		}
 	}
 	
+	@Override
 	public void mergeMagic(Map<String,String> mergeData, String field, Object value, String joinOp, Pattern matchPattern) {
 		if ( value == null || !StringUtils.hasText(value.toString()) ) {
 			return;
@@ -815,6 +811,7 @@ public class LuceneSearchService implements LuceneService {
 		}
 	}
 
+	@Override
 	public Query parseQuery(String indexType, String query) {
 		if ( traceLog.isDebugEnabled() ) {
 			traceLog.debug("Parsing Lucene query string [" +query +"]");
@@ -834,6 +831,7 @@ public class LuceneSearchService implements LuceneService {
 		}
 	}
 	
+	@Override
 	public void appendTerm(StringBuilder buf, String field, 
 			String value, boolean required, boolean prohibited) {
 		if ( !StringUtils.hasText(value) ) {
@@ -895,6 +893,7 @@ public class LuceneSearchService implements LuceneService {
 		}
 	}
 	
+	@Override
 	public void appendTerms(StringBuilder buf, String field, List<?> input, String booleanOp, boolean required) {
 		if ( input.size() < 1 ) {
 			return; // skip
@@ -972,7 +971,7 @@ public class LuceneSearchService implements LuceneService {
 	
 	private abstract static class LuceneIndexStatusCallback implements IndexStatusCallback {
 
-		private Logger log = Logger.getLogger(getClass());
+		private final Logger log = Logger.getLogger(getClass());
 		
 		private boolean done = false;
 		private Throwable throwable = null;
@@ -989,10 +988,12 @@ public class LuceneSearchService implements LuceneService {
 			this.indexResults = indexResults;
 		}
 		
+		@Override
 		public IndexResults getIndexResults() {
 			return indexResults;
 		}
 
+		@Override
 		public void waitUntilDone() {
 			synchronized ( this ) {
 				try {
@@ -1086,6 +1087,7 @@ public class LuceneSearchService implements LuceneService {
 		
 	}
 	
+	@Override
 	public void doIndexQueryOp(final String type, final Query query, 
 			final boolean synchronous, final IndexQueryOp queryOp ) {
 		if ( query == null ) {
@@ -1109,6 +1111,7 @@ public class LuceneSearchService implements LuceneService {
 		}
 	}
 
+	@Override
 	public void doIndexSearcherOp(String type, IndexSearcherOp searcherOp) {
 		final IndexData data = indexDataMap.get(type);
 		IndexSearcher searcher = getIndexSearcher(data);
@@ -1155,9 +1158,7 @@ public class LuceneSearchService implements LuceneService {
 		}
 	}
 	
-	/* (non-Javadoc)
-	 * @see magoffin.matt.lucene.LuceneService#doIndexUpdateOp(magoffin.matt.lucene.LuceneService.String, magoffin.matt.lucene.LuceneService.IndexReaderOp, boolean, boolean, boolean, magoffin.matt.lucene.LuceneService.IndexWriterOp)
-	 */
+	@Override
 	public void doIndexUpdateOp(String type, IndexReaderOp readerOp, boolean create, 
 			boolean optimize, boolean optimizeOnFinish, IndexWriterOp writeOp) {
 		IndexData data = indexDataMap.get(type);
@@ -1259,9 +1260,7 @@ public class LuceneSearchService implements LuceneService {
 		}
 	}
 	
-	/* (non-Javadoc)
-	 * @see magoffin.matt.lucene.LuceneService#doIndexReaderOp(magoffin.matt.lucene.LuceneService.String, magoffin.matt.lucene.LuceneService.IndexReaderOp)
-	 */
+	@Override
 	public void doIndexReaderOp(String type, IndexReaderOp readerOp) {
 		IndexData data = indexDataMap.get(type);
 		IndexReader reader = null;
@@ -1285,9 +1284,7 @@ public class LuceneSearchService implements LuceneService {
 	}
 	
 	
-	/* (non-Javadoc)
-	 * @see magoffin.matt.lucene.LuceneService#doIndexWriterOp(magoffin.matt.lucene.LuceneService.String, boolean, boolean, boolean, magoffin.matt.lucene.LuceneService.IndexWriterOp)
-	 */
+	@Override
 	public void doIndexWriterOp(String type, boolean create, boolean optimize, 
 			boolean optimizeOnFinish, IndexWriterOp writeOp) {
 		IndexData data = indexDataMap.get(type);
@@ -1354,6 +1351,7 @@ public class LuceneSearchService implements LuceneService {
 		}
 	}
 	
+	@Override
 	public Set<String> getFieldTerms(final String index, final String field) {
 		final Set<String> results = new TreeSet<String>();
 		IndexData data = indexDataMap.get(index);
@@ -1452,16 +1450,12 @@ public class LuceneSearchService implements LuceneService {
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see magoffin.matt.lucene.LuceneService#addIndexEventListener(java.util.EventListener)
-	 */
+	@Override
 	public synchronized void addIndexEventListener(IndexListener listener) {
 		this.indexEventListeners.add(listener);
 	}
 
-	/* (non-Javadoc)
-	 * @see magoffin.matt.lucene.LuceneService#removeIndexEventListener(java.util.EventListener)
-	 */
+	@Override
 	public synchronized void removeIndexEventListener(IndexListener listener) {
 		if ( this.indexEventListeners == null ) return;
 		for ( Iterator<IndexListener> itr = this.indexEventListeners.iterator(); itr.hasNext(); ) {
@@ -1472,37 +1466,27 @@ public class LuceneSearchService implements LuceneService {
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see magoffin.matt.lucene.LuceneService#formatDateToDay(java.util.Date)
-	 */
+	@Override
 	public String formatDateToDay(Date date) {
 		return dayDateFormat.format(date);
 	}
 
-	/* (non-Javadoc)
-	 * @see magoffin.matt.lucene.LuceneService#formatDateToDay(java.util.Date, java.util.TimeZone)
-	 */
+	@Override
 	public String formatDateToDay(Date date, TimeZone zone) {
 		return dayDateFormat.format(date, zone);
 	}
 
-	/* (non-Javadoc)
-	 * @see magoffin.matt.lucene.LuceneService#formatDateToMonth(java.util.Date)
-	 */
+	@Override
 	public String formatDateToMonth(Date date) {
 		return monthDateFormat.format(date);
 	}
 
-	/* (non-Javadoc)
-	 * @see magoffin.matt.lucene.LuceneService#formatDateToMonth(java.util.Date, java.util.TimeZone)
-	 */
+	@Override
 	public String formatDateToMonth(Date date, TimeZone zone) {
 		return monthDateFormat.format(date, zone);
 	}
 
-	/* (non-Javadoc)
-	 * @see magoffin.matt.lucene.LuceneService#parseDate(java.lang.String, java.util.TimeZone)
-	 */
+	@Override
 	public Date parseDate(String dateStr, TimeZone zone) {
 		Calendar result = null;
 		try {
@@ -1527,9 +1511,7 @@ public class LuceneSearchService implements LuceneService {
 		return result == null ? null : result.getTime();
 	}
 
-	/* (non-Javadoc)
-	 * @see magoffin.matt.lucene.LuceneService#parseDate(java.lang.String)
-	 */
+	@Override
 	public Date parseDate(String dateStr) {
 		Date result = null;
 		try {
@@ -1571,9 +1553,9 @@ public class LuceneSearchService implements LuceneService {
 			CALLBACK,
 		}
 		
-		private Object item;
-		private IndexQueueThreadCommand.Operation op;
-		private String type;
+		private final Object item;
+		private final IndexQueueThreadCommand.Operation op;
+		private final String type;
 		private IndexStatusCallback statusCallback = null;
 		private boolean indexById = true;
 		private boolean callingThread = false;
@@ -1636,9 +1618,7 @@ public class LuceneSearchService implements LuceneService {
 
 		private LuceneSearchService luceneSearchService;
 		
-		/* (non-Javadoc)
-		 * @see org.aopalliance.intercept.MethodInterceptor#invoke(org.aopalliance.intercept.MethodInvocation)
-		 */
+		@Override
 		public Object invoke(MethodInvocation invocation) throws Throwable {
 			String methodName = invocation.getMethod().getName();
 			if ( methodName.startsWith("indexObject") ) {
@@ -1683,10 +1663,10 @@ public class LuceneSearchService implements LuceneService {
 
 	private final class IndexQueueThread extends BaseQueueThread<IndexQueueThreadCommand> {
 		
-		private Map<String, Queue<IndexQueueThreadCommand>> bufferMap = 
+		private final Map<String, Queue<IndexQueueThreadCommand>> bufferMap = 
 			new HashMap<String, Queue<IndexQueueThreadCommand>>();
 		
-		private ExecutorService callbackExecutor = Executors.newCachedThreadPool();
+		private final ExecutorService callbackExecutor = Executors.newCachedThreadPool();
 		
 		private IndexQueueThread() {
 			// call super constructor with "stop" item
@@ -1709,6 +1689,8 @@ public class LuceneSearchService implements LuceneService {
 				case REINDEX:
 				case CALLBACK:
 					callbackExecutor.execute(new Runnable() {
+
+						@Override
 						public void run() {
 							if ( traceLog.isInfoEnabled() ) {
 								traceLog.info(TraceOp.CONCURRENCY +"Processing " +command.op
@@ -1784,6 +1766,8 @@ public class LuceneSearchService implements LuceneService {
 				= new LinkedHashMap<Object, IndexQueueThreadCommand>();
 
 			doIndexReaderOp(indexType, new IndexReaderOp() {
+
+				@Override
 				public void doReaderOp(String type, IndexReader reader) {
 					while ( !queue.isEmpty() ) {
 						IndexQueueThreadCommand command = queue.remove();					
@@ -1807,6 +1791,8 @@ public class LuceneSearchService implements LuceneService {
 
 			if ( toUpdate.size() > 0 ) {
 				doIndexUpdateOp(indexType, new IndexReaderOp() {
+
+					@Override
 					public void doReaderOp(String type, IndexReader reader) {
 						// process index deletes
 						for ( IndexQueueThreadCommand command : toUpdate.values() ) {
@@ -1814,6 +1800,8 @@ public class LuceneSearchService implements LuceneService {
 						}
 					}				
 				}, false, true, false, new IndexWriterOp() {
+
+					@Override
 					public void doWriterOp(String type, IndexWriter writer) {
 						// process index updates
 						IndexData indexData = indexDataMap.get(type);
@@ -1904,9 +1892,9 @@ public class LuceneSearchService implements LuceneService {
 		private IndexReader reader;
 		private Directory dir;
 		private int updateCount;
-		private AtomicInteger queryCount; // may need to use AtomicLong?
+		private final AtomicInteger queryCount; // may need to use AtomicLong?
 		private AtomicInteger readerCount;
-		private Lock writeLock;
+		private final Lock writeLock;
 
 		private IndexData() {
 			this(null, null, null);
@@ -1931,10 +1919,10 @@ public class LuceneSearchService implements LuceneService {
 			this.reader = reader;
 			this.indexType = indexType;
 		}
-		private long discardTime;
-		private AtomicInteger readerCount;
-		private IndexReader reader;
-		private String indexType;
+		private final long discardTime;
+		private final AtomicInteger readerCount;
+		private final IndexReader reader;
+		private final String indexType;
 	}
 	
 	/**
@@ -2112,9 +2100,7 @@ public class LuceneSearchService implements LuceneService {
 		this.plugins = plugins;
 	}
 	
-	/**
-	 * @return Returns the indexTimeZone.
-	 */
+	@Override
 	public TimeZone getIndexTimeZone() {
 		return indexTimeZone;
 	}

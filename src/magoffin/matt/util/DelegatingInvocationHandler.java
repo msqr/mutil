@@ -43,7 +43,7 @@ import java.util.List;
  */
 public class DelegatingInvocationHandler implements InvocationHandler {
 	
-	private Object myDelegate;
+	private final Object myDelegate;
 	
 	/**
 	 * Delegate all method calls to another object.
@@ -53,9 +53,7 @@ public class DelegatingInvocationHandler implements InvocationHandler {
 		myDelegate = delegate;
 	}
 
-	/* (non-Javadoc)
-	 * @see java.lang.reflect.InvocationHandler#invoke(java.lang.Object, java.lang.reflect.Method, java.lang.Object[])
-	 */
+	@Override
 	public Object invoke(Object proxy, Method method, Object[] args)
 	throws Throwable {
 		Method delegateMethod = myDelegate.getClass().getMethod(method.getName(),

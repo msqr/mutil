@@ -30,7 +30,6 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-
 import org.apache.log4j.Logger;
 
 /**
@@ -44,13 +43,11 @@ import org.apache.log4j.Logger;
  */
 public class IndexUpdateTracker implements IndexListener {
 	
-	private Map<String, List<Object>> updateMap = new HashMap<String, List<Object>>();
+	private final Map<String, List<Object>> updateMap = new HashMap<String, List<Object>>();
 	
 	private final Logger log = Logger.getLogger(IndexUpdateTracker.class);
 
-	/* (non-Javadoc)
-	 * @see magoffin.matt.lucene.IndexListener#onIndexEvent(magoffin.matt.lucene.IndexEvent)
-	 */
+	@Override
 	public void onIndexEvent(IndexEvent event) {
 		if ( IndexEvent.EventType.UPDATE == event.getType() ) {
 			List<Object> typeList = updateMap.get(event.getIndexType());

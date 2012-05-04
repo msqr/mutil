@@ -27,7 +27,6 @@
 package magoffin.matt.util;
 
 import java.io.InputStream;
-
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.core.io.Resource;
 
@@ -41,23 +40,17 @@ public class InputStreamFactoryBean implements FactoryBean<InputStream> {
 	
 	private Resource resource;
 
-	/* (non-Javadoc)
-	 * @see org.springframework.beans.factory.FactoryBean#getObject()
-	 */
+	@Override
 	public InputStream getObject() throws Exception {
 		return resource.getInputStream();
 	}
 
-	/* (non-Javadoc)
-	 * @see org.springframework.beans.factory.FactoryBean#getObjectType()
-	 */
+	@Override
 	public Class<? extends InputStream> getObjectType() {
 		return InputStream.class;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.springframework.beans.factory.FactoryBean#isSingleton()
-	 */
+	@Override
 	public boolean isSingleton() {
 		return false;
 	}

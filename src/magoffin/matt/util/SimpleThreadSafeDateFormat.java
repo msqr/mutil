@@ -76,16 +76,12 @@ public class SimpleThreadSafeDateFormat implements ThreadSafeDateFormat {
 	}
 
 
-	/* (non-Javadoc)
-	 * @see magoffin.matt.util.ThreadSafeDateFormat#getPattern()
-	 */
+	@Override
 	public String getPattern() {
 		return datePattern;
 	}
 
-	/* (non-Javadoc)
-	 * @see magoffin.matt.util.ThreadSafeDateFormat#format(java.util.Date)
-	 */
+	@Override
 	public String format(Date date) {
 		SimpleDateFormat sdf = getSdfInstance();
 		return sdf.format(date);
@@ -97,9 +93,7 @@ public class SimpleThreadSafeDateFormat implements ThreadSafeDateFormat {
 		return sdf;
 	}
 
-	/* (non-Javadoc)
-	 * @see magoffin.matt.util.ThreadSafeDateFormat#format(java.util.Date, java.util.TimeZone)
-	 */
+	@Override
 	public String format(Date date, TimeZone zone) {
 		if ( zone == null ) {
 			return format(date);
@@ -109,17 +103,13 @@ public class SimpleThreadSafeDateFormat implements ThreadSafeDateFormat {
 		return sdf.format(date);
 	}
 
-	/* (non-Javadoc)
-	 * @see magoffin.matt.util.ThreadSafeDateFormat#format(java.util.Calendar)
-	 */
+	@Override
 	public String format(Calendar date) {
 		SimpleDateFormat sdf = getSdfInstance();
 		return sdf.format(date.getTime());
 	}
 
-	/* (non-Javadoc)
-	 * @see magoffin.matt.util.ThreadSafeDateFormat#format(java.util.Calendar, java.util.TimeZone)
-	 */
+	@Override
 	public String format(Calendar date, TimeZone zone) {
 		if ( zone == null ) {
 			return format(date);
@@ -129,16 +119,12 @@ public class SimpleThreadSafeDateFormat implements ThreadSafeDateFormat {
 		return sdf.format(date.getTime());
 	}
 
-	/* (non-Javadoc)
-	 * @see magoffin.matt.util.ThreadSafeDateFormat#getCalendarInstance()
-	 */
+	@Override
 	public Calendar getCalendarInstance() {
 		return Calendar.getInstance(timeZone);
 	}
 
-	/* (non-Javadoc)
-	 * @see magoffin.matt.util.ThreadSafeDateFormat#parseCalendar(java.lang.String)
-	 */
+	@Override
 	public Calendar parseCalendar(String dateStr) {
 		Date d = parseDate(dateStr);
 		Calendar cal = getCalendarInstance();
@@ -146,9 +132,7 @@ public class SimpleThreadSafeDateFormat implements ThreadSafeDateFormat {
 		return cal;
 	}
 
-	/* (non-Javadoc)
-	 * @see magoffin.matt.util.ThreadSafeDateFormat#parseCalendar(java.lang.String, java.util.TimeZone)
-	 */
+	@Override
 	public Calendar parseCalendar(String dateStr, TimeZone zone) {
 		if ( zone == null ) {
 			return parseCalendar(dateStr);
@@ -165,9 +149,7 @@ public class SimpleThreadSafeDateFormat implements ThreadSafeDateFormat {
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see magoffin.matt.util.ThreadSafeDateFormat#parseDate(java.lang.String)
-	 */
+	@Override
 	public Date parseDate(String dateStr) {
 		SimpleDateFormat sdf = getSdfInstance();
 		try {

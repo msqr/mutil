@@ -40,8 +40,8 @@ import java.io.InputStream;
  */
 public class FileBasedTemporaryFile implements TemporaryFile {
 	
-	private String contentType;
-	private File file;
+	private final String contentType;
+	private final File file;
 	
 	/**
 	 * Construct from a File.
@@ -54,30 +54,22 @@ public class FileBasedTemporaryFile implements TemporaryFile {
 		this.contentType = contentType;
 	}
 
-	/* (non-Javadoc)
-	 * @see magoffin.matt.util.TemporaryFile#getContentType()
-	 */
+	@Override
 	public String getContentType() {
 		return contentType;
 	}
 
-	/* (non-Javadoc)
-	 * @see magoffin.matt.util.TemporaryFile#getInputStream()
-	 */
+	@Override
 	public InputStream getInputStream() throws IOException {
 		return new BufferedInputStream(new FileInputStream(file));
 	}
 
-	/* (non-Javadoc)
-	 * @see magoffin.matt.util.TemporaryFile#getName()
-	 */
+	@Override
 	public String getName() {
 		return file.getName();
 	}
 
-	/* (non-Javadoc)
-	 * @see magoffin.matt.util.TemporaryFile#getSize()
-	 */
+	@Override
 	public long getSize() {
 		return file.length();
 	}
