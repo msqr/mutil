@@ -19,7 +19,8 @@
 
   $Id: build.xml,v 1.5 2007/10/02 09:03:52 matt Exp $   
 -->
-<project name="Mutil" default="dist">
+<project name="Mutil" default="dist"
+	 xmlns:ivy="antlib:org.apache.ivy.ant">
 
 	<property file="build.properties" />
 
@@ -44,17 +45,29 @@
 		<format property="build.time" pattern="MM/dd/yyyy hh:mm aa z" />
 	</tstamp>
 	
-	<path id="compile.path">
-		<pathelement location="${dir.compile}"/>
-		<fileset dir="${dir.lib}" includes="**/*.jar"/>
-	</path>
-	
 	<target name="init">
 		<mkdir dir="${dir.build}" />
 	</target>
+
+	<!-- Ivy integration -->
+
+	<target name="ivy-init">
+		<taskdef resource="org/apache/ivy/ant/antlib.xml"
+			uri="antlib:org.apache.ivy.ant"
+			classpath="${dir.lib}/ivy-2.2.0.jar"/>
+	</target>
 	
-	<target name="compile" description="Compile source files">
+	<target name="lib-init" depends="ivy-init">
+		<ivy:settings file="${dir.lib}/ivysettings.xml"/>
+	</target>
+	
+	<target name="lib-resolve" depends="lib-init">
+		<ivy:resolve file="${basedir}/ivy.xml" conf="compile"/>
+	</target>
+
+	<target name="compile" depends="lib-resolve" description="Compile source files">
 		<mkdir dir="${dir.compile}"/>
+		<ivy:cachepath pathid="lib.path" conf="compile"/>
 		<javac srcdir="${dir.source}"
 			destdir="${dir.compile}"
 			debug="${compile.debug}" 
@@ -63,7 +76,7 @@
 			nowarn="${compile.nowarn}"
 			target="1.6"
 			source="1.6">
-			<classpath refid="compile.path" />
+			<classpath refid="lib.path" />
 		</javac>
 	</target>
 	
