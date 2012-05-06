@@ -81,4 +81,9 @@ public abstract class BaseEntityLong implements Entity<Long> {
 		return true;
 	}
 
+	@Override
+	public String toString() {
+		return getClass().getSimpleName() + "{id=" + getId() + '}';
+	}
+
 }
