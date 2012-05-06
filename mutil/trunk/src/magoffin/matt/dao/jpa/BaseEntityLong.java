@@ -29,6 +29,7 @@ package magoffin.matt.dao.jpa;
 import javax.persistence.MappedSuperclass;
 import magoffin.matt.dao.Entity;
 import magoffin.matt.dao.Identity;
+import magoffin.matt.dao.SearchResult;
 
 /**
  * Base entity class for Long primary key values.
@@ -37,7 +38,7 @@ import magoffin.matt.dao.Identity;
  * @version $Revision$ $Date$
  */
 @MappedSuperclass
-public abstract class BaseEntityLong implements Entity<Long> {
+public abstract class BaseEntityLong implements Entity<Long>, SearchResult<Long> {
 
 	@Override
 	public int compareTo(Identity<Long> arg0) {
