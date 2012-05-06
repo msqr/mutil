@@ -28,7 +28,7 @@
 	<property name="dir.source" value="src"/>
 	<property name="dir.build" value="build/ant" />
 	<property name="dir.compile" value="${dir.build}/classes"/>
-	<property name="dir.dist" value="dist"/>
+	<property name="dir.dist" value="target"/>
 	<property name="dir.lib" value="lib"/>
 	
 	<property name="app.name" value="mutil" />
@@ -99,6 +99,8 @@
 			</fileset>
 		</jar>
 	</target>
+	
+	<target name="jar" description="Build the JAR" depends="dist-mutil-jar"/>
 	
 	<target name="dist" description="Prepare the distribution JARs"
 		depends="dist-mutil-jar"/>
