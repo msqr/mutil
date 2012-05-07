@@ -122,6 +122,9 @@
 		</dependency>
 		
 		<!-- Unit test support -->
+		<dependency org="org.subethamail" name="subethasmtp" rev="3.1.6">
+    		<artifact name="subethasmtp" type="jar" />
+		</dependency>
 		<dependency org="org.testng" name="testng" rev="6.5.1" conf="test">
 			<artifact name="testng" type="jar" />
 		</dependency>
