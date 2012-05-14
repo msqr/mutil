@@ -31,7 +31,7 @@
 	<property name="dir.dist" value="target"/>
 	<property name="dir.lib" value="lib"/>
 	
-	<property name="app.name" value="mutil" />
+	<property name="app.name" value="mutil2" />
 	
 	<property name="dir.app.dest" value="${dir.build}/${app.name}"/>
 	<property name="compile.debug" value="true" />
