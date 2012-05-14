@@ -40,7 +40,7 @@ public interface SearchResults {
 	 * Get the search matches.
 	 * @return the matches.
 	 */
-	List<SearchMatch> getMatches();
+	List<?> getMatches();
 	
 	/**
 	 * Get the total search matches.

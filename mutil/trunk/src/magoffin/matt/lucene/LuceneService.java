@@ -31,8 +31,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TimeZone;
 import java.util.regex.Pattern;
-
-
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.search.BooleanQuery;
@@ -41,8 +39,8 @@ import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TopDocCollector;
 
 /**
- * API for Lucene plug-in implementation to use for 
- * accessing Lucene functionality.
+ * API for Lucene plug-in implementation to use for accessing Lucene
+ * functionality.
  * 
  * @author matt.magoffin
  * @version $Revision: 1.4 $ $Date: 2007/03/10 02:54:52 $
@@ -413,7 +411,7 @@ public interface LuceneService {
 	 * @param end the ending hits index to build to
 	 * @return the List of SearchMatch objects
 	 */
-	List<SearchMatch> build(String index, TopDocCollector hits, int start, int end);
+	List<?> build(String index, TopDocCollector hits, int start, int end);
 	
 	/**
 	 * Add an EventListener for index operations.

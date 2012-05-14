@@ -26,7 +26,6 @@ package magoffin.matt.lucene;
 
 import java.util.List;
 import java.util.Set;
-
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.index.IndexWriter;
@@ -120,7 +119,7 @@ public interface LucenePlugin {
 	 * @param doc the Lucene Document
 	 * @return a SearchMatch object
 	 */
-	SearchMatch build(Document doc);
+	Object build(Document doc);
 	
 	/**
 	 * Index a set of data.
@@ -140,7 +139,7 @@ public interface LucenePlugin {
 	 * @param criteria the search criteria
 	 * @return the search results (should never be <em>null</em>)
 	 */
-	List<SearchMatch> search(SearchCriteria criteria);
+	List<?> search(SearchCriteria criteria);
 	
 	/**
 	 * Get the native query for a given criteria.

@@ -37,7 +37,7 @@ import java.util.List;
  */
 public class BasicSearchResults implements SearchResults {
 	
-	private List<SearchMatch> matches;
+	private List<?> matches;
 	private int totalMatches;
 	
 	/**
@@ -54,13 +54,13 @@ public class BasicSearchResults implements SearchResults {
 	 * @param matches the matches
 	 * @param totalMatches the total matches
 	 */
-	public BasicSearchResults(List<SearchMatch> matches, int totalMatches) {
+	public BasicSearchResults(List<?> matches, int totalMatches) {
 		this.matches = matches;
 		this.totalMatches = totalMatches;
 	}
 
 	@Override
-	public List<SearchMatch> getMatches() {
+	public List<?> getMatches() {
 		return matches;
 	}
 
@@ -72,7 +72,7 @@ public class BasicSearchResults implements SearchResults {
 	/**
 	 * @param matches the matches to set
 	 */
-	public void setMatches(List<SearchMatch> matches) {
+	public void setMatches(List<?> matches) {
 		this.matches = matches;
 	}
 	

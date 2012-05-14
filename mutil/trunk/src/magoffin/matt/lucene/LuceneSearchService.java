@@ -93,65 +93,68 @@ import org.springframework.util.StringUtils;
 /**
  * Service for searching and indexing Lucene indicies.
  * 
- * <p>All index update operations happen within a separate thread and are 
- * queued in the order in which they are received. The <code>updateBufferSize</code>
- * property determines how many updates are buffered as to perform serveral 
- * updates as a batch. If this is set to a value greater than <code>1</code>, 
+ * <p>
+ * All index update operations happen within a separate thread and are queued in
+ * the order in which they are received. The <code>updateBufferSize</code>
+ * property determines how many updates are buffered as to perform serveral
+ * updates as a batch. If this is set to a value greater than <code>1</code>,
  * then updates requests will be buffered until <code>updateBufferSize</code>
  * updates are queued. At that them all updates in the buffer will be processed.
- * An exception to this buffering is a reindex operation, which will <em>not</em>
- * be buffered and instead will proceed immediately.</p>
+ * An exception to this buffering is a reindex operation, which will
+ * <em>not</em> be buffered and instead will proceed immediately.
+ * </p>
  * 
- * <p>The configurable properties of this class are:</p>
+ * <p>
+ * The configurable properties of this class are:
+ * </p>
  * 
  * <dl>
- *   <dt>baseIndexDirectoryPath</dt>
- *   <dd>The path where this class can manage Lucene index files. Note the 
- *   application must be able to read, write, and create new files here.</dd>
- *   
- *   <dt>indexTimeZone</dt>
- *   <dd>The time zone to translate all dates in the index to for consistency.
- *   Defaults to the local time zone.</dd>
- *   
- *   <dt>neverOptimize</dt>
- *   <dd>If <em>true</em> then never try to optimize. This useful during 
- *   testing. Defaults to <b>false</b>.</dd>
- *   
- *   <dt>optimizeTriggerCount</dt>
- *   <dd>The number of items to index before asking Lucene to optimize the 
- *   index for searching.</dd>
- *   
- *   <dt>updateBufferSize</dt>
- *   <dd>The number of items to buffer (for each index) before trying to 
- *   index them. Defaults to <code>1</code> so each item is indexed 
- *   immediately.</dd>
- *   
- *   <dt>updateBufferFlushMs</dt>
- *   <dd>The number of milliseconds between flushing the index queue buffers.
- *   Only useful if the <code>updateBufferSize</code> is greater than 1.
- *   Defaults to <code>0</code> (which disables the periodic flushing).</dd>
- *   
- *   <dt>plugins</dt>
- *   <dd>The list of {@link magoffin.matt.lucene.LucenePlugin} instances
- *   to use.</dd>
- *   
- *   <dt>batchMinMergeDocs</dt>
- *   <dd>The Lucene {@link IndexWriter#setMaxBufferedDocs(int)} value to use while
- *   performing batch index operations. Defaults to <b>500</b>.</dd>
- *   
- *   <dt>batchMergeFactor</dt>
- *   <dd>The Lucene {@link IndexWriter#setMergeFactor(int)} value to use while 
- *   performing batch index operations. Defaults to <b>50</b>.</dd>
- *   
- *   <dt>discardedIndexReaderMinCloseTime</dt>
- *   <dd>The minimum amount of milliseconds to hold on to discarded IndexReader instances
- *   before calling the {@link org.apache.lucene.index.IndexReader#close()} method
- *   on that object. Defaults to 60,000 (one minute).</dd>
- *   
- *   <dt>discardedIndexReaderProcessorMs</dt>
- *   <dd>The number of milliseconds between examining the discarded IndexReader buffer
- *   for IndexReader instances to close. Defaults to 180,000 (3 minutes).</dd>
- *   
+ * <dt>baseIndexDirectoryPath</dt>
+ * <dd>The path where this class can manage Lucene index files. Note the
+ * application must be able to read, write, and create new files here.</dd>
+ * 
+ * <dt>indexTimeZone</dt>
+ * <dd>The time zone to translate all dates in the index to for consistency.
+ * Defaults to the local time zone.</dd>
+ * 
+ * <dt>neverOptimize</dt>
+ * <dd>If <em>true</em> then never try to optimize. This useful during testing.
+ * Defaults to <b>false</b>.</dd>
+ * 
+ * <dt>optimizeTriggerCount</dt>
+ * <dd>The number of items to index before asking Lucene to optimize the index
+ * for searching.</dd>
+ * 
+ * <dt>updateBufferSize</dt>
+ * <dd>The number of items to buffer (for each index) before trying to index
+ * them. Defaults to <code>1</code> so each item is indexed immediately.</dd>
+ * 
+ * <dt>updateBufferFlushMs</dt>
+ * <dd>The number of milliseconds between flushing the index queue buffers. Only
+ * useful if the <code>updateBufferSize</code> is greater than 1. Defaults to
+ * <code>0</code> (which disables the periodic flushing).</dd>
+ * 
+ * <dt>plugins</dt>
+ * <dd>The list of {@link magoffin.matt.lucene.LucenePlugin} instances to use.</dd>
+ * 
+ * <dt>batchMinMergeDocs</dt>
+ * <dd>The Lucene {@link IndexWriter#setMaxBufferedDocs(int)} value to use while
+ * performing batch index operations. Defaults to <b>500</b>.</dd>
+ * 
+ * <dt>batchMergeFactor</dt>
+ * <dd>The Lucene {@link IndexWriter#setMergeFactor(int)} value to use while
+ * performing batch index operations. Defaults to <b>50</b>.</dd>
+ * 
+ * <dt>discardedIndexReaderMinCloseTime</dt>
+ * <dd>The minimum amount of milliseconds to hold on to discarded IndexReader
+ * instances before calling the
+ * {@link org.apache.lucene.index.IndexReader#close()} method on that object.
+ * Defaults to 60,000 (one minute).</dd>
+ * 
+ * <dt>discardedIndexReaderProcessorMs</dt>
+ * <dd>The number of milliseconds between examining the discarded IndexReader
+ * buffer for IndexReader instances to close. Defaults to 180,000 (3 minutes).</dd>
+ * 
  * </dl>
  * 
  * @author Matt Magoffin (spamsqr@msqr.us)
@@ -588,12 +591,12 @@ public class LuceneSearchService implements LuceneService {
 	}
 
 	@Override
-	public List<SearchMatch> build(String index, final TopDocCollector hits, final int start, final int end) {
+	public List<?> build(String index, final TopDocCollector hits, final int start, final int end) {
 		final LucenePlugin plugin = this.indexDataMap.get(index).plugin;
 		final int length = end > start ? end - start : 0;
 		final ScoreDoc[] docs = hits.topDocs().scoreDocs;
 		final int hitLength = docs.length;
-		final List<SearchMatch> searchMatches = new ArrayList<SearchMatch>(length);
+		final List<Object> searchMatches = new ArrayList<Object>(length);
 		doIndexSearcherOp(index, new IndexSearcherOp() {
 
 			@Override
@@ -1899,8 +1902,8 @@ public class LuceneSearchService implements LuceneService {
 		private IndexData() {
 			this(null, null, null);
 		}
-		private IndexData(Directory dir, String type, 
-				LucenePlugin plugin) {
+
+		private IndexData(Directory dir, String type, LucenePlugin plugin) {
 			this.updateCount = 0;
 			this.plugin = plugin;
 			this.type = type;
