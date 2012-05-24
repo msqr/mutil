@@ -355,12 +355,12 @@ public class LuceneSearchService implements LuceneService {
 				IndexData data = new IndexData(dir, type, plugin);
 				indexDataMap.put(type, data);
 			} else {
-				IndexData data = indexDataMap.get(type);
+				IndexData data = getIndexData(type);
 				data.dir = FSDirectory.getDirectory(indexDir);
 				data.type = type;
 				data.plugin = plugin;
 			}
-			IndexData indexData = indexDataMap.get(type);
+			IndexData indexData = getIndexData(type);
 			// indexData.indexDirectory = indexDir;
 			if ( plugin.getAnalyzer() == null ) {
 				throw new RuntimeException("Analyzer not configured for index [" 
@@ -421,6 +421,23 @@ public class LuceneSearchService implements LuceneService {
 		log.info("LuceneSearchService.finish() complete.");
 	}
 	
+	/**
+	 * Get an IndexData object for a given index type.
+	 * 
+	 * @param type
+	 *        the type
+	 * @return the IndexData, never <em>null</em>
+	 * @throws IllegalArgumentException
+	 *         if the IndexData is not available
+	 */
+	private IndexData getIndexData(String type) {
+		IndexData data = indexDataMap.get(type);
+		if ( data == null ) {
+			throw new IllegalArgumentException("Index [" + type + "] not avaialble");
+		}
+		return data;
+	}
+
 	/**
 	 * Flush a single index's update queue.
 	 * @param type the index queue to flush
@@ -544,7 +561,7 @@ public class LuceneSearchService implements LuceneService {
 					+"], LuceneSearchService is shut down");
 			return null;
 		}
-		final IndexData indexData = indexDataMap.get(type);
+		final IndexData indexData = getIndexData(type);
 		if ( this.updateBufferSize < 1 ) {
 			LuceneIndexStatusCallback callback = new LuceneIndexStatusCallback() {
 				@Override
@@ -570,7 +587,7 @@ public class LuceneSearchService implements LuceneService {
 
 	@Override
 	public SearchResults find(String index, SearchCriteria criteria) {
-		IndexData indexData = this.indexDataMap.get(index);
+		final IndexData indexData = getIndexData(index);
 		if ( criteria.isCountOnly() ) {
 			Object o = indexData.plugin.getNativeQuery(criteria);
 			if ( o instanceof Query ) {
@@ -592,7 +609,7 @@ public class LuceneSearchService implements LuceneService {
 
 	@Override
 	public List<?> build(String index, final TopDocCollector hits, final int start, final int end) {
-		final LucenePlugin plugin = this.indexDataMap.get(index).plugin;
+		final LucenePlugin plugin = getPluginForString(index);
 		final int length = end > start ? end - start : 0;
 		final ScoreDoc[] docs = hits.topDocs().scoreDocs;
 		final int hitLength = docs.length;
@@ -721,7 +738,7 @@ public class LuceneSearchService implements LuceneService {
 	public void addTokenizedTermQuery(BooleanQuery rootQuery, String query, 
 			String field, String type) {
 		StringReader reader = new StringReader(query);
-		IndexData data = indexDataMap.get(type);
+		IndexData data = getIndexData(type);
 		TokenStream stream = data.plugin.getAnalyzer().tokenStream(
 				field, reader);
 		try {
@@ -755,7 +772,7 @@ public class LuceneSearchService implements LuceneService {
 	public void addTokenizedFuzzyQuery(BooleanQuery rootQuery, String query, 
 			String field, String type) {
 		StringReader reader = new StringReader(query);
-		IndexData data = indexDataMap.get(type);
+		IndexData data = getIndexData(type);
 		TokenStream stream = data.plugin.getAnalyzer().tokenStream(
 				field, reader);
 		try {
@@ -828,7 +845,8 @@ public class LuceneSearchService implements LuceneService {
 		}
 		try {
 			return new QueryParser(this.defaultField,
-					indexDataMap.get(indexType).plugin.getAnalyzer()).parse(query);
+ getPluginForString(indexType).getAnalyzer())
+					.parse(query);
 		} catch (ParseException e) {
 			throw new RuntimeException("Unable to parse Lucene query [" +query +"]", e);
 		}
@@ -1096,7 +1114,7 @@ public class LuceneSearchService implements LuceneService {
 		if ( query == null ) {
 			return;
 		}
-		final IndexData data = indexDataMap.get(type);
+		final IndexData data = getIndexData(type);
 		if ( synchronous && indexQueue != null ) {
 			LuceneIndexStatusCallback callback = new LuceneIndexStatusCallback() {
 				@Override
@@ -1116,7 +1134,7 @@ public class LuceneSearchService implements LuceneService {
 
 	@Override
 	public void doIndexSearcherOp(String type, IndexSearcherOp searcherOp) {
-		final IndexData data = indexDataMap.get(type);
+		final IndexData data = getIndexData(type);
 		IndexSearcher searcher = getIndexSearcher(data);
 		AtomicInteger readerCount = data.readerCount;
 		readerCount.incrementAndGet();
@@ -1164,7 +1182,7 @@ public class LuceneSearchService implements LuceneService {
 	@Override
 	public void doIndexUpdateOp(String type, IndexReaderOp readerOp, boolean create, 
 			boolean optimize, boolean optimizeOnFinish, IndexWriterOp writeOp) {
-		IndexData data = indexDataMap.get(type);
+		IndexData data = getIndexData(type);
 		IndexReader reader = null;
 		IndexWriter writer = null;
 		Lock lock = data.writeLock;
@@ -1265,7 +1283,7 @@ public class LuceneSearchService implements LuceneService {
 	
 	@Override
 	public void doIndexReaderOp(String type, IndexReaderOp readerOp) {
-		IndexData data = indexDataMap.get(type);
+		IndexData data = getIndexData(type);
 		IndexReader reader = null;
 		Lock lock = data.writeLock;
 		lock.lock();
@@ -1290,7 +1308,7 @@ public class LuceneSearchService implements LuceneService {
 	@Override
 	public void doIndexWriterOp(String type, boolean create, boolean optimize, 
 			boolean optimizeOnFinish, IndexWriterOp writeOp) {
-		IndexData data = indexDataMap.get(type);
+		IndexData data = getIndexData(type);
 		IndexWriter writer = null;
 		Lock lock = data.writeLock;
 		lock.lock();
@@ -1357,7 +1375,7 @@ public class LuceneSearchService implements LuceneService {
 	@Override
 	public Set<String> getFieldTerms(final String index, final String field) {
 		final Set<String> results = new TreeSet<String>();
-		IndexData data = indexDataMap.get(index);
+		IndexData data = getIndexData(index);
 		AtomicInteger readerCount = data.readerCount;
 		TermEnum terms = null;
 		readerCount.incrementAndGet();
@@ -1778,7 +1796,7 @@ public class LuceneSearchService implements LuceneService {
 							// handle later so delete / update within same lock
 							Object itemId = command.item;
 							if ( !command.indexById ) {
-								IndexData indexData = indexDataMap.get(type);
+								IndexData indexData = getIndexData(type);
 								itemId = indexData.plugin.getIdForObject(command.item);
 							}
 							toUpdate.put(itemId, command);
@@ -1807,7 +1825,7 @@ public class LuceneSearchService implements LuceneService {
 					@Override
 					public void doWriterOp(String type, IndexWriter writer) {
 						// process index updates
-						IndexData indexData = indexDataMap.get(type);
+						IndexData indexData = getIndexData(type);
 						for ( IndexQueueThreadCommand command : toUpdate.values() ) {
 							try {
 								if ( command.indexById ) {
@@ -1871,7 +1889,7 @@ public class LuceneSearchService implements LuceneService {
 			if ( command.indexById ) {
 				deleteFromIndex(type, reader, command.item);
 			} else {
-				IndexData indexData = indexDataMap.get(type);
+				IndexData indexData = getIndexData(type);
 				Object id = indexData.plugin.getIdForObject(command.item);
 				if ( id != null ) {
 					deleteFromIndex(type, reader, id);
@@ -1937,7 +1955,7 @@ public class LuceneSearchService implements LuceneService {
 	 * @return the LucenePlugin
 	 */
 	protected LucenePlugin getPluginForString(String type) {
-		IndexData indexData = indexDataMap.get(type);
+		IndexData indexData = getIndexData(type);
 		return indexData.plugin;
 	}
 
