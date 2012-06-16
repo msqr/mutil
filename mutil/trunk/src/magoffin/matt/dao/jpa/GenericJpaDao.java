@@ -126,6 +126,7 @@ public abstract class GenericJpaDao<T, PK extends Serializable> implements
 			prePersist(domainObject);
 			getEm().persist(domainObject);
 			if ( refreshOnPersist ) {
+				getEm().flush();
 				getEm().refresh(domainObject);
 			}
 			pk = getPK(domainObject);
